@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="StoryForge AI — Story Viewer with analytics, retention analysis, and editing" />
+    <title>StoryForge AI — Story Viewer</title>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="story-viewer.css" />
+</head>
+
+<body class="sv-body">
+
+    <!-- ═══ Navbar ═══ -->
+    <nav class="sv-navbar">
+        <a href="/" class="sv-nav-brand">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            StoryForge AI
+        </a>
+        <div class="sv-nav-actions">
+            <button class="sv-btn sv-btn-accent" id="sv-intel-btn" style="display:none;">🧠 Intelligence Map</button>
+            <button class="sv-btn" id="sv-back-btn" onclick="window.location.href='/'">← New Story</button>
+        </div>
+    </nav>
+
+    <!-- ═══ Main Content ═══ -->
+    <main class="sv-main" id="sv-main">
+
+        <!-- Loading State -->
+        <div class="sv-loading" id="sv-loading">
+            <div class="sv-spinner"></div>
+            <span style="color: var(--text-secondary); font-size: 0.9rem;">Loading story...</span>
+        </div>
+
+        <!-- Story Content (hidden until loaded) -->
+        <div id="sv-content" style="display: none;">
+
+            <!-- Story Header -->
+            <header class="sv-header">
+                <h1 class="sv-story-title" id="sv-story-title"></h1>
+                <div class="sv-meta-tags" id="sv-meta-tags"></div>
+            </header>
+
+            <!-- Tab Nav -->
+            <div class="sv-tabs" id="sv-tabs">
+                <button class="sv-tab active" data-tab="episodes">🎬 Episodes</button>
+                <button class="sv-tab" data-tab="characters">👥 Characters</button>
+                <button class="sv-tab" data-tab="emotional-arc">💓 Emotional Arc</button>
+                <button class="sv-tab" data-tab="retention">📊 Retention</button>
+                <button class="sv-tab" data-tab="twists">🌀 Twists</button>
+                <button class="sv-tab" data-tab="hashtags"># Hashtags</button>
+            </div>
+
+            <!-- ═══ EPISODES TAB ═══ -->
+            <div class="sv-panel active" id="panel-episodes">
+                <div class="sv-section-title">🎬 Episode Scripts</div>
+                <div id="sv-episodes-list"></div>
+            </div>
+
+            <!-- ═══ CHARACTERS TAB ═══ -->
+            <div class="sv-panel" id="panel-characters">
+                <div class="sv-section-title">👥 Characters</div>
+                <div id="sv-characters-list"></div>
+            </div>
+
+            <!-- ═══ EMOTIONAL ARC TAB ═══ -->
+            <div class="sv-panel" id="panel-emotional-arc">
+                <div class="sv-section-title">💓 Emotional Arc Progression</div>
+                <div class="sv-arc-container" id="sv-arc-container"></div>
+                <div class="sv-momentum-container" id="sv-momentum-container"></div>
+            </div>
+
+            <!-- ═══ RETENTION TAB ═══ -->
+            <div class="sv-panel" id="panel-retention">
+                <div class="sv-section-title">📊 Retention Risk Predictor</div>
+                <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 20px;">
+                    Each episode is divided into 4 time blocks. Scores measure curiosity, conflict, information gain,
+                    and emotional shift. Below <strong>4.0</strong> = HIGH risk of viewer drop-off.
+                </p>
+                <div id="sv-retention-list"></div>
+            </div>
+
+            <!-- ═══ TWISTS TAB ═══ -->
+            <div class="sv-panel" id="panel-twists">
+                <div class="sv-section-title">🌀 Netflix 3-Layer Twist System</div>
+                <div id="sv-twists-list"></div>
+            </div>
+
+            <!-- ═══ HASHTAGS TAB ═══ -->
+            <div class="sv-panel" id="panel-hashtags">
+                <div class="sv-section-title"># Viral Hashtags</div>
+                <div class="sv-hashtag-cloud" id="sv-hashtag-cloud"></div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- ═══ Edit Chatbar (fixed bottom) ═══ -->
+    <div class="sv-chatbar hidden" id="sv-chatbar">
+        <div class="sv-chatbar-label">✏️ EDIT EPISODE</div>
+        <div class="sv-chatbar-episode" id="sv-chatbar-episode">Select an episode to edit</div>
+        <div class="sv-quick-actions" id="sv-quick-actions"></div>
+        <div class="sv-custom-input">
+            <input type="text" id="sv-custom-prompt" placeholder="Type a custom edit instruction..." />
+            <button id="sv-send-edit" disabled>Apply</button>
+        </div>
+    </div>
+
+    <script src="story-viewer.js"></script>
+</body>
+
+</html>

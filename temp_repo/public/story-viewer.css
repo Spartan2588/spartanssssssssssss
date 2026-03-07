@@ -1,0 +1,817 @@
+/* ═══════════════════════════════════════════════════════════════════
+   STORY VIEWER — CSS
+   Standalone styles for /story-viewer.html
+   Inherits design tokens from styles.css
+═══════════════════════════════════════════════════════════════════ */
+
+/* ─── Layout ──────────────────────────────────────────────────── */
+.sv-body {
+    overflow-y: auto !important;
+    padding-bottom: 120px;
+}
+
+.sv-navbar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 28px;
+    background: rgba(8, 11, 20, 0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+}
+
+.sv-nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    text-decoration: none;
+}
+
+.sv-nav-brand svg {
+    color: var(--accent);
+}
+
+.sv-nav-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.sv-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    color: var(--text-primary);
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.sv-btn:hover {
+    border-color: var(--border-hover);
+    background: var(--surface-2);
+}
+
+.sv-btn-accent {
+    border-color: var(--accent);
+    background: rgba(108, 99, 255, 0.15);
+}
+
+.sv-btn-accent:hover {
+    background: rgba(108, 99, 255, 0.25);
+}
+
+/* ─── Main Container ──────────────────────────────────────────── */
+.sv-main {
+    max-width: 1060px;
+    margin: 0 auto;
+    padding: 32px 24px;
+}
+
+/* ─── Story Header ────────────────────────────────────────────── */
+.sv-header {
+    margin-bottom: 32px;
+}
+
+.sv-story-title {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    background: linear-gradient(135deg, var(--text-primary), var(--accent-2));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.sv-meta-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.sv-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    font-weight: 500;
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    background: var(--surface);
+}
+
+/* ─── Tab Navigation ──────────────────────────────────────────── */
+.sv-tabs {
+    display: flex;
+    gap: 4px;
+    padding: 4px;
+    background: var(--surface);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    margin-bottom: 24px;
+    overflow-x: auto;
+}
+
+.sv-tab {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: 0.82rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+    white-space: nowrap;
+}
+
+.sv-tab:hover {
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.sv-tab.active {
+    color: var(--text-primary);
+    background: var(--accent);
+    box-shadow: 0 2px 8px var(--accent-glow);
+}
+
+/* ─── Tab Panels ──────────────────────────────────────────────── */
+.sv-panel {
+    display: none;
+}
+
+.sv-panel.active {
+    display: block;
+    animation: svFadeIn 0.3s ease;
+}
+
+@keyframes svFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+/* ─── Episode Cards ───────────────────────────────────────────── */
+.sv-episode {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    margin-bottom: 16px;
+    overflow: hidden;
+    transition: var(--transition);
+}
+
+.sv-episode:hover {
+    border-color: var(--border-hover);
+}
+
+.sv-ep-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.sv-ep-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.sv-ep-number {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: #fff;
+    flex-shrink: 0;
+}
+
+.sv-ep-title {
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.sv-ep-purpose {
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    margin-top: 2px;
+}
+
+.sv-ep-badges {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.sv-ep-badge {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    border: 1px solid var(--border);
+}
+
+.sv-badge-emotion {
+    color: #f472b6;
+    border-color: rgba(244, 114, 182, 0.3);
+}
+
+.sv-badge-cliff {
+    color: var(--accent-2);
+    border-color: rgba(167, 139, 250, 0.3);
+}
+
+.sv-badge-momentum {
+    color: var(--green);
+    border-color: rgba(16, 185, 129, 0.3);
+}
+
+.sv-badge-momentum.risk {
+    color: #ef4444;
+    border-color: rgba(239, 68, 68, 0.3);
+}
+
+.sv-ep-toggle {
+    font-size: 1rem;
+    color: var(--text-muted);
+    transition: var(--transition);
+}
+
+.sv-episode.open .sv-ep-toggle {
+    transform: rotate(180deg);
+}
+
+.sv-ep-body {
+    display: none;
+    padding: 0 20px 20px;
+    border-top: 1px solid var(--border);
+}
+
+.sv-episode.open .sv-ep-body {
+    display: block;
+}
+
+.sv-ep-script {
+    font-size: 0.88rem;
+    line-height: 1.75;
+    color: var(--text-secondary);
+    padding: 16px 0;
+    white-space: pre-wrap;
+}
+
+.sv-ep-cliff {
+    margin-top: 12px;
+    padding: 12px 16px;
+    background: rgba(108, 99, 255, 0.08);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    font-size: 0.85rem;
+    color: var(--accent-2);
+}
+
+.sv-ep-cliff strong {
+    color: var(--text-primary);
+}
+
+/* ─── Retention Heatmap ───────────────────────────────────────── */
+.sv-retention-section {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+}
+
+.sv-retention-label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 10px;
+}
+
+.sv-retention-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+}
+
+.sv-retention-block {
+    padding: 10px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    text-align: center;
+    font-size: 0.72rem;
+    transition: var(--transition);
+}
+
+.sv-retention-block:hover {
+    transform: scale(1.03);
+}
+
+.sv-retention-block.risk-safe {
+    background: rgba(16, 185, 129, 0.08);
+    border-color: rgba(16, 185, 129, 0.3);
+}
+
+.sv-retention-block.risk-medium {
+    background: rgba(245, 158, 11, 0.08);
+    border-color: rgba(245, 158, 11, 0.3);
+}
+
+.sv-retention-block.risk-high {
+    background: rgba(239, 68, 68, 0.08);
+    border-color: rgba(239, 68, 68, 0.3);
+}
+
+.sv-ret-block-label {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.sv-ret-score {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 4px 0;
+}
+
+.sv-risk-safe .sv-ret-score {
+    color: var(--green);
+}
+
+.sv-risk-medium .sv-ret-score {
+    color: #f59e0b;
+}
+
+.sv-risk-high .sv-ret-score {
+    color: #ef4444;
+}
+
+.sv-ret-risk {
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.sv-ret-reason {
+    color: var(--text-secondary);
+    margin-top: 4px;
+    line-height: 1.3;
+}
+
+/* ─── Characters & Twists Cards ───────────────────────────────────── */
+.sv-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 20px;
+    margin-bottom: 16px;
+    transition: var(--transition);
+}
+
+.sv-card:hover {
+    border-color: var(--border-hover);
+}
+
+.sv-card-title {
+    font-weight: 700;
+    font-size: 1rem;
+    margin-bottom: 8px;
+    color: var(--text-primary);
+}
+
+.sv-card-detail {
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+    line-height: 1.5;
+}
+
+.sv-card-detail strong {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.sv-twist-type {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 10px;
+}
+
+.sv-twist-expectation {
+    background: rgba(59, 130, 246, 0.15);
+    color: var(--blue);
+}
+
+.sv-twist-identity {
+    background: rgba(139, 92, 246, 0.15);
+    color: var(--purple);
+}
+
+.sv-twist-moral {
+    background: rgba(16, 185, 129, 0.15);
+    color: var(--green);
+}
+
+/* ─── Emotional Arc Graph ─────────────────────────────────────── */
+.sv-arc-container {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 24px;
+}
+
+.sv-arc-summary {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-bottom: 20px;
+}
+
+.sv-arc-bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    height: 200px;
+    padding-top: 16px;
+}
+
+.sv-arc-bar-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    height: 100%;
+    justify-content: flex-end;
+}
+
+.sv-arc-bar {
+    width: 100%;
+    border-radius: 6px 6px 0 0;
+    transition: height 0.5s ease, background 0.3s ease;
+    position: relative;
+}
+
+.sv-arc-score {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.sv-arc-label {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+}
+
+/* ─── Momentum Chart ──────────────────────────────────────────── */
+.sv-momentum-container {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 24px;
+    margin-top: 20px;
+}
+
+.sv-momentum-title {
+    font-weight: 700;
+    margin-bottom: 16px;
+    font-size: 0.95rem;
+}
+
+.sv-momentum-bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+    height: 140px;
+}
+
+.sv-momentum-bar-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    height: 100%;
+    justify-content: flex-end;
+}
+
+.sv-momentum-bar {
+    width: 100%;
+    border-radius: 6px 6px 0 0;
+    transition: height 0.5s ease;
+}
+
+.sv-momentum-score {
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+.sv-momentum-label {
+    font-size: 0.68rem;
+    color: var(--text-muted);
+}
+
+/* ─── Hashtags ────────────────────────────────────────────────── */
+.sv-hashtag-cloud {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.sv-hashtag {
+    padding: 6px 14px;
+    border-radius: 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    font-size: 0.82rem;
+    color: var(--accent-2);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.sv-hashtag:hover {
+    background: rgba(108, 99, 255, 0.1);
+    border-color: var(--accent);
+    transform: scale(1.05);
+}
+
+/* ─── Edit Chatbar ────────────────────────────────────────────── */
+.sv-chatbar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 200;
+    background: rgba(8, 11, 20, 0.92);
+    backdrop-filter: blur(24px);
+    border-top: 1px solid var(--border);
+    padding: 14px 24px;
+    transition: transform 0.3s ease;
+}
+
+.sv-chatbar.hidden {
+    transform: translateY(100%);
+}
+
+.sv-chatbar-label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+}
+
+.sv-chatbar-episode {
+    font-size: 0.8rem;
+    color: var(--accent-2);
+    margin-bottom: 10px;
+}
+
+.sv-quick-actions {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+}
+
+.sv-quick-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 12px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: var(--surface);
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.sv-quick-btn:hover {
+    border-color: var(--accent);
+    color: var(--text-primary);
+    background: rgba(108, 99, 255, 0.1);
+}
+
+.sv-quick-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.sv-custom-input {
+    display: flex;
+    gap: 8px;
+}
+
+.sv-custom-input input {
+    flex: 1;
+    padding: 10px 16px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    color: var(--text-primary);
+    font-size: 0.85rem;
+    font-family: var(--font-main);
+    outline: none;
+    transition: var(--transition);
+}
+
+.sv-custom-input input:focus {
+    border-color: var(--accent);
+}
+
+.sv-custom-input input::placeholder {
+    color: var(--text-muted);
+}
+
+.sv-custom-input button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: var(--radius-sm);
+    background: var(--accent);
+    color: #fff;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.sv-custom-input button:hover {
+    filter: brightness(1.15);
+}
+
+.sv-custom-input button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* ─── Edit Feedback Toast ─────────────────────────────────────── */
+.sv-toast {
+    position: fixed;
+    top: 80px;
+    right: 24px;
+    z-index: 300;
+    padding: 12px 20px;
+    border-radius: var(--radius-sm);
+    font-size: 0.85rem;
+    font-weight: 500;
+    animation: svSlideIn 0.3s ease, svSlideOut 0.3s ease 2.7s;
+    pointer-events: none;
+}
+
+.sv-toast-success {
+    background: rgba(16, 185, 129, 0.2);
+    color: var(--green);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.sv-toast-error {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+@keyframes svSlideIn {
+    from {
+        transform: translateX(100px);
+        opacity: 0;
+    }
+
+    to {
+        transform: none;
+        opacity: 1;
+    }
+}
+
+@keyframes svSlideOut {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+        transform: translateX(40px);
+    }
+}
+
+/* ─── Section Titles ──────────────────────────────────────────── */
+.sv-section-title {
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* ─── Loading State ───────────────────────────────────────────── */
+.sv-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 50vh;
+    gap: 16px;
+}
+
+.sv-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ─── Responsive ──────────────────────────────────────────────── */
+@media (max-width: 768px) {
+    .sv-main {
+        padding: 20px 14px;
+    }
+
+    .sv-story-title {
+        font-size: 1.5rem;
+    }
+
+    .sv-tabs {
+        overflow-x: auto;
+    }
+
+    .sv-tab {
+        font-size: 0.75rem;
+        padding: 8px 10px;
+    }
+
+    .sv-retention-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .sv-ep-badges {
+        flex-wrap: wrap;
+        margin-top: 8px;
+    }
+
+    .sv-ep-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .sv-chatbar {
+        padding: 10px 14px;
+    }
+
+    .sv-quick-actions {
+        gap: 4px;
+    }
+}

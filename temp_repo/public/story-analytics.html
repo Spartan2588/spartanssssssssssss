@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description"
+        content="StoryForge AI — Story Intelligence Map: Branching Decision Tree, Emotional Arc, Retention & Cliffhanger Analytics" />
+    <title>StoryForge AI — Intelligence Map</title>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="story-analytics.css" />
+    <!-- D3.js v7 for tree visualization (served locally to satisfy CSP) -->
+    <script src="/lib/d3.v7.min.js"></script>
+</head>
+
+<body class="sa-body">
+
+    <!-- ═══ Navbar ═══ -->
+    <nav class="sa-navbar">
+        <a href="/" class="sa-nav-brand">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            StoryForge AI
+        </a>
+        <div class="sa-nav-actions">
+            <button class="sa-btn" id="sa-back-btn">← Story Viewer</button>
+        </div>
+    </nav>
+
+    <!-- ═══ Main ═══ -->
+    <main class="sa-main" id="sa-main">
+
+        <!-- Loading -->
+        <div class="sa-loading" id="sa-loading">
+            <div class="sa-spinner"></div>
+            <span style="color: rgba(200,212,255,0.7); font-size: 0.9rem;">Generating Intelligence Map...</span>
+        </div>
+
+        <!-- Content (hidden until loaded) -->
+        <div id="sa-content" style="display: none;">
+
+            <!-- Header -->
+            <header class="sa-header">
+                <div class="sa-header-badge">🧠 STORY INTELLIGENCE MAP</div>
+                <h1 class="sa-title" id="sa-title"></h1>
+                <div class="sa-meta" id="sa-meta"></div>
+            </header>
+
+            <!-- ═══ Section 1: Branching Decision Tree ═══ -->
+            <section class="sa-section">
+                <div class="sa-section-header">
+                    <h2 class="sa-section-title">🌳 Narrative Decision Tree</h2>
+                    <p class="sa-section-desc">Interactive branching tree showing all possible narrative directions.
+                        The <span style="color: #34d399; font-weight: 600;">highlighted path</span> is the
+                        highest-retention route from start to end. Click any node for detailed analysis.</p>
+                </div>
+                <div class="sa-depth-slider-wrap">
+                    <label class="sa-depth-label-text" for="sa-depth-slider">Narrative Depth</label>
+                    <div class="sa-depth-slider-row">
+                        <span class="sa-depth-min">1</span>
+                        <input type="range" id="sa-depth-slider" min="1" max="6" value="4" step="1"
+                            class="sa-depth-range" />
+                        <span class="sa-depth-max">6</span>
+                    </div>
+                    <div class="sa-depth-current">Level: <span id="sa-depth-label">4</span></div>
+                </div>
+                <div id="sa-tree-stats" style="margin-bottom: 16px;"></div>
+                <div class="sa-tree-canvas-wrap" id="sa-tree"></div>
+            </section>
+
+            <!-- ═══ Section 2: Emotional Arc Curve ═══ -->
+            <section class="sa-section">
+                <div class="sa-section-header">
+                    <h2 class="sa-section-title">💓 Emotional Arc Curve</h2>
+                    <p class="sa-section-desc">Emotional intensity progression across the narrative. Peaks indicate
+                        high-engagement moments.</p>
+                </div>
+                <div class="sa-chart-container" id="sa-arc-chart"></div>
+            </section>
+
+            <!-- ═══ Section 3: Retention Heatmap ═══ -->
+            <section class="sa-section">
+                <div class="sa-section-header">
+                    <h2 class="sa-section-title">📊 Retention Predictor Heatmap</h2>
+                    <p class="sa-section-desc">Predicted viewer retention across 4 time segments per episode. Darker =
+                        higher risk of drop-off.</p>
+                </div>
+                <div class="sa-heatmap-container" id="sa-heatmap"></div>
+            </section>
+
+            <!-- ═══ Section 4: Cliffhanger Strength ═══ -->
+            <section class="sa-section">
+                <div class="sa-section-header">
+                    <h2 class="sa-section-title">🔗 Cliffhanger Strength Analysis</h2>
+                    <p class="sa-section-desc">Sub-score breakdown for each episode's ending: Curiosity Gap, Shock
+                        Value, Narrative Stakes, Urgency.</p>
+                </div>
+                <div class="sa-cliff-container" id="sa-cliff"></div>
+            </section>
+
+        </div>
+    </main>
+
+    <script src="story-analytics.js"></script>
+</body>
+
+</html>
