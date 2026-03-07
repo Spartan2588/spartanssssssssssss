@@ -1,0 +1,53 @@
+═══════════════════════════════════════════════════════════
+  STORYFORGE AI - QUICK ACCESS LINKS
+═══════════════════════════════════════════════════════════
+
+✅ SYSTEM STATUS: RUNNING
+
+🌐 MAIN APPLICATION
+   http://localhost:5000
+   → Full StoryForge dashboard (auth bypassed)
+
+📚 BACKEND API DOCUMENTATION
+   http://localhost:8000/docs
+   → Interactive API docs (Swagger UI)
+
+🧪 BACKEND TEST INTERFACE
+   http://localhost:8000
+   → Simple test UI for episodic engine
+
+🔧 API HEALTH CHECK
+   http://localhost:8000/health
+   → Server status and mode
+
+═══════════════════════════════════════════════════════════
+
+🎯 QUICK START GUIDE:
+
+1. Open: http://localhost:5000
+2. You're auto-logged in as "Demo User"
+3. Create a story:
+   - Choose genre & mood
+   - Set episode count
+   - Enter story description
+   - Click "Generate Story"
+
+═══════════════════════════════════════════════════════════
+
+⚡ CURRENT MODE: DEMO (Mock AI responses)
+
+To enable real AI generation:
+1. Get OpenAI API key from: https://platform.openai.com/
+2. Add to both .env files:
+   - episodic_engine/.env
+   - temp_repo/.env
+3. Restart servers
+
+═══════════════════════════════════════════════════════════
+
+🔓 AUTHENTICATION: BYPASSED
+   - No login required
+   - Full access to all features
+   - Demo user auto-created
+
+═══════════════════════════════════════════════════════════

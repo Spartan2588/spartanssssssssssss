@@ -1,0 +1,406 @@
+{
+  "story_id": "demo0001",
+  "arc": {
+    "story_id": "demo0001",
+    "premise": "A teenage girl discovers she can hear the last words of the dead by touching objects they owned — but the voices start following her home.",
+    "genre": "supernatural horror",
+    "total_episodes": 6,
+    "entity_registry": {
+      "Mara": [
+        "protagonist",
+        "teenager",
+        "hears voices of the dead"
+      ],
+      "Maya Chen": [
+        "murder victim",
+        "ghost",
+        "names killer"
+      ],
+      "Mr Holloway": [
+        "science teacher",
+        "murderer",
+        "antagonist"
+      ],
+      "Dex": [
+        "Mara's best friend",
+        "confidant"
+      ],
+      "Grandmother's Locket": [
+        "key object",
+        "conductor of voices"
+      ]
+    },
+    "episodes": [
+      {
+        "episode_index": 1,
+        "title": "The Weight of the Old Violin",
+        "abstract": "Mara, 17, touches a dusty violin at a pawn shop and hears the final plea of its dead owner. Shaken, she flees — but the voice echoes in her head all night.",
+        "narrative_function": {
+          "name": "exposition",
+          "description": "Introduce the protagonist and world.",
+          "constraint_weight": 0.5
+        },
+        "chapter_begin_node": {
+          "subject": "Mara",
+          "verb": "enters",
+          "obj": "pawn shop",
+          "time_stamp": 0,
+          "chapter_index": 1
+        },
+        "chapter_end_node": {
+          "subject": "voice",
+          "verb": "follows",
+          "obj": "Mara home",
+          "time_stamp": 10,
+          "chapter_index": 1
+        },
+        "chapter_plot_nodes": [
+          {
+            "subject": "Mara",
+            "verb": "reaches",
+            "obj": "for violin hesitantly",
+            "time_stamp": 1,
+            "chapter_index": 1
+          },
+          {
+            "subject": "violin",
+            "verb": "radiates",
+            "obj": "cold psychic energy",
+            "time_stamp": 2,
+            "chapter_index": 1
+          }
+        ],
+        "events": [
+          "Mara touches vintage violin",
+          "Dead man's voice erupts",
+          "Mara flees in panic"
+        ],
+        "sub_events": [],
+        "emotional_score": -0.12,
+        "cliffhanger_score": 8.0,
+        "retention_risk": 0.218,
+        "discriminator_scores": {
+          "valence": -0.3,
+          "intensity": 0.65,
+          "surprise": 0.75,
+          "empathy_pull": 0.7,
+          "cliffhanger": 8.0,
+          "retention_risk": 0.218
+        },
+        "generated_text": null
+      },
+      {
+        "episode_index": 2,
+        "title": "Every Surface Screams",
+        "abstract": "Mara wakes unable to touch anything without triggering voices. Her bedroom becomes a gauntlet of dead strangers' last words. She cuts class and tries to map her new ability.",
+        "narrative_function": {
+          "name": "inciting_incident",
+          "description": "A disruptive event kicks off the central conflict.",
+          "constraint_weight": 0.8
+        },
+        "chapter_begin_node": {
+          "subject": "Mara",
+          "verb": "wakes",
+          "obj": "surrounded by voices",
+          "time_stamp": 0,
+          "chapter_index": 2
+        },
+        "chapter_end_node": {
+          "subject": "Mara",
+          "verb": "discovers",
+          "obj": "pattern in the voices",
+          "time_stamp": 10,
+          "chapter_index": 2
+        },
+        "chapter_plot_nodes": [
+          {
+            "subject": "Mara",
+            "verb": "yanks",
+            "obj": "hand away from bedframe",
+            "time_stamp": 1,
+            "chapter_index": 2
+          },
+          {
+            "subject": "Mara",
+            "verb": "logs",
+            "obj": "voice triggers in notebook",
+            "time_stamp": 2,
+            "chapter_index": 2
+          }
+        ],
+        "events": [
+          "Bedframe triggers 3 voices",
+          "Mara skips school",
+          "Voices intensify near old objects"
+        ],
+        "sub_events": [],
+        "emotional_score": -0.27,
+        "cliffhanger_score": 8.1,
+        "retention_risk": 0.256,
+        "discriminator_scores": {
+          "valence": -0.5,
+          "intensity": 0.75,
+          "surprise": 0.55,
+          "empathy_pull": 0.85,
+          "cliffhanger": 8.1,
+          "retention_risk": 0.256
+        },
+        "generated_text": null
+      },
+      {
+        "episode_index": 3,
+        "title": "The Murdered Girl in the Locket",
+        "abstract": "Her grandmother's locket reveals a murdered girl, Maya Chen, who whispers the name of her killer — a name Mara recognises as her science teacher, Mr Holloway.",
+        "narrative_function": {
+          "name": "rising_action",
+          "description": "Escalating complications raise the stakes.",
+          "constraint_weight": 0.6
+        },
+        "chapter_begin_node": {
+          "subject": "Mara",
+          "verb": "opens",
+          "obj": "grandmother's locket",
+          "time_stamp": 0,
+          "chapter_index": 3
+        },
+        "chapter_end_node": {
+          "subject": "Mara",
+          "verb": "recognises",
+          "obj": "teacher's name as killer",
+          "time_stamp": 10,
+          "chapter_index": 3
+        },
+        "chapter_plot_nodes": [
+          {
+            "subject": "Mara",
+            "verb": "hesitates",
+            "obj": "before opening locket",
+            "time_stamp": 1,
+            "chapter_index": 3
+          },
+          {
+            "subject": "Maya",
+            "verb": "whispers",
+            "obj": "Holloway's full name",
+            "time_stamp": 2,
+            "chapter_index": 3
+          }
+        ],
+        "events": [
+          "Locket triggers vivid clear voice",
+          "Maya Chen names her killer",
+          "Mara pulls up teacher's photo"
+        ],
+        "sub_events": [],
+        "emotional_score": -0.48,
+        "cliffhanger_score": 9.7,
+        "retention_risk": 0.231,
+        "discriminator_scores": {
+          "valence": -0.7,
+          "intensity": 0.9,
+          "surprise": 0.9,
+          "empathy_pull": 0.8,
+          "cliffhanger": 9.7,
+          "retention_risk": 0.231
+        },
+        "generated_text": null
+      },
+      {
+        "episode_index": 4,
+        "title": "Do Not Tell Anyone",
+        "abstract": "Mara confides in her best friend Dex, who is thrilled and terrified. That night, a new voice appears — this one knows Mara's full name.",
+        "narrative_function": {
+          "name": "revelation",
+          "description": "A major discovery recontextualises earlier events.",
+          "constraint_weight": 0.9
+        },
+        "chapter_begin_node": {
+          "subject": "Mara",
+          "verb": "tells",
+          "obj": "Dex about the ability",
+          "time_stamp": 0,
+          "chapter_index": 4
+        },
+        "chapter_end_node": {
+          "subject": "unknown voice",
+          "verb": "whispers",
+          "obj": "Mara's full name",
+          "time_stamp": 10,
+          "chapter_index": 4
+        },
+        "chapter_plot_nodes": [
+          {
+            "subject": "Dex",
+            "verb": "records",
+            "obj": "Mara touching objects on video",
+            "time_stamp": 1,
+            "chapter_index": 4
+          },
+          {
+            "subject": "strange voice",
+            "verb": "interrupts",
+            "obj": "Mara's sleep at 3am",
+            "time_stamp": 2,
+            "chapter_index": 4
+          }
+        ],
+        "events": [
+          "Mother dismisses Mara",
+          "Dex is fascinated",
+          "Sentient voice interrupts sleep"
+        ],
+        "sub_events": [],
+        "emotional_score": -0.29,
+        "cliffhanger_score": 9.3,
+        "retention_risk": 0.274,
+        "discriminator_scores": {
+          "valence": -0.4,
+          "intensity": 0.7,
+          "surprise": 0.85,
+          "empathy_pull": 0.75,
+          "cliffhanger": 9.3,
+          "retention_risk": 0.274
+        },
+        "generated_text": null
+      },
+      {
+        "episode_index": 5,
+        "title": "The Dead Don't Stay Dead",
+        "abstract": "The sentient voice is Maya Chen — and she is angry. She threatens to manifest unless Mara exposes Holloway. Mara sneaks into school and finds physical evidence in Holloway's desk.",
+        "narrative_function": {
+          "name": "dark_night_of_the_soul",
+          "description": "Protagonist faces their lowest point.",
+          "constraint_weight": 0.85
+        },
+        "chapter_begin_node": {
+          "subject": "Maya",
+          "verb": "threatens",
+          "obj": "to manifest",
+          "time_stamp": 0,
+          "chapter_index": 5
+        },
+        "chapter_end_node": {
+          "subject": "Mara",
+          "verb": "finds",
+          "obj": "hidden evidence at school",
+          "time_stamp": 10,
+          "chapter_index": 5
+        },
+        "chapter_plot_nodes": [
+          {
+            "subject": "Mara",
+            "verb": "sneaks",
+            "obj": "into school after hours",
+            "time_stamp": 1,
+            "chapter_index": 5
+          },
+          {
+            "subject": "Mara",
+            "verb": "pries",
+            "obj": "open Holloway's desk drawer",
+            "time_stamp": 2,
+            "chapter_index": 5
+          }
+        ],
+        "events": [
+          "Maya's voice becomes visible static",
+          "Mara sneaks into school alone",
+          "Evidence: a bloody locket key"
+        ],
+        "sub_events": [],
+        "emotional_score": -0.6,
+        "cliffhanger_score": 9.6,
+        "retention_risk": 0.289,
+        "discriminator_scores": {
+          "valence": -0.85,
+          "intensity": 0.95,
+          "surprise": 0.7,
+          "empathy_pull": 0.9,
+          "cliffhanger": 9.6,
+          "retention_risk": 0.289
+        },
+        "generated_text": null
+      },
+      {
+        "episode_index": 6,
+        "title": "Touch Him and You'll Know Everything",
+        "abstract": "Mara confronts Holloway and accidentally grabs his hand — receiving a torrent of memories: the murder, the cover-up, three more victims. Maya manifests physically. Holloway sees her.",
+        "narrative_function": {
+          "name": "climax",
+          "description": "Peak confrontation where the central conflict is resolved.",
+          "constraint_weight": 1.0
+        },
+        "chapter_begin_node": {
+          "subject": "Mara",
+          "verb": "confronts",
+          "obj": "Mr Holloway",
+          "time_stamp": 0,
+          "chapter_index": 6
+        },
+        "chapter_end_node": {
+          "subject": "Maya",
+          "verb": "manifests",
+          "obj": "visible to Holloway",
+          "time_stamp": 10,
+          "chapter_index": 6
+        },
+        "chapter_plot_nodes": [
+          {
+            "subject": "Mara",
+            "verb": "extends",
+            "obj": "her hand toward Holloway",
+            "time_stamp": 1,
+            "chapter_index": 6
+          },
+          {
+            "subject": "Holloway",
+            "verb": "grabs",
+            "obj": "Mara's wrist defensively",
+            "time_stamp": 2,
+            "chapter_index": 6
+          },
+          {
+            "subject": "Mara",
+            "verb": "absorbs",
+            "obj": "flood of murderous memories",
+            "time_stamp": 3,
+            "chapter_index": 6
+          }
+        ],
+        "events": [
+          "Mara touches Holloway — floods of memory",
+          "Three more victims revealed",
+          "Maya manifests physically",
+          "Holloway collapses"
+        ],
+        "sub_events": [],
+        "emotional_score": 0.09,
+        "cliffhanger_score": 9.5,
+        "retention_risk": 0.312,
+        "discriminator_scores": {
+          "valence": 0.2,
+          "intensity": 1.0,
+          "surprise": 0.8,
+          "empathy_pull": 0.95,
+          "cliffhanger": 9.5,
+          "retention_risk": 0.312
+        },
+        "generated_text": null
+      }
+    ],
+    "emotional_arc_summary": "A tightly wound escalating horror arc beginning with isolated dread (–0.12) and plunging to crisis (–0.60) before a cathartic but unsettling climax (+0.09). The arc delivers strong emotional variety with clear peaks at episodes 3 and 5 and no dead zones — ideal for 90-second vertical retention.",
+    "avg_cliffhanger_score": 9.03,
+    "avg_retention_risk": 0.263,
+    "improvement_suggestions": [
+      "[ARC|HIGH|character] Eps [4, 6]: Dex disappears after episode 4. Bring him back in episode 6 to add emotional counterweight to the climax.",
+      "[ARC|HIGH|pacing] Eps [5, 6]: Episodes 5–6 are consecutively maximum-intensity. Insert a 10-second 'breath' moment at the top of episode 6 before the confrontation to maximise cathartic payoff.",
+      "[ARC|MEDIUM|emotional_arc] Eps [2, 3]: Episode 2's sustained negative valence (-0.50) risks emotional fatigue before the teacher reveal. Add a 5-second moment of dark humour or warmth to break the monotony.",
+      "[ARC|MEDIUM|narrative_function] Eps [2]: Consider adding a micro 'world_building' beat — audiences need a brief explanation of how the ability works before they fully invest in its escalation.",
+      "[ARC|LOW|cliffhanger] Eps [1, 2]: Episodes 1–2 score 8.0/10 — strong, but episode 3's 9.7 shows what's possible. Sharpen the final verb of each CEN to be more viscerally active."
+    ]
+  },
+  "pipeline_log": [
+    "demo_runner: all 6 stages executed"
+  ],
+  "status": "success"
+}

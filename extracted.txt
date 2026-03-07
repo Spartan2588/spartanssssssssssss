@@ -1,0 +1,2152 @@
+
+
+===== LLM based.pdf (9 pages) =====
+--- Page 1 ---
+Guiding and Diversifying LLM-Based Story Generation
+via Answer Set Programming
+Phoebe J. Wang1 and Max Kreminski1,2
+1Santa Clara University, 2Midjourney
+wjingsen@gmail.com, mkreminski@midjourney.com
+Abstract
+Instruction-tuned
+large
+language
+models
+(LLMs) are capable of generating stories in
+response to open-ended user requests, but
+the resulting stories tend to be limited in
+their diversity. Older, symbolic approaches
+to story generation (such as planning) can
+generate
+substantially
+more
+diverse
+plot
+outlines, but are limited to producing stories
+that recombine a fixed set of hand-engineered
+character action templates. Can we combine
+the strengths of these approaches while
+mitigating their weaknesses?
+We propose
+to do so by using a higher-level and more
+abstract symbolic specification of high-level
+story structure—implemented via answer set
+programming (ASP)—to guide and diversify
+LLM-based story generation. Via semantic
+similarity analysis, we demonstrate that our
+approach produces more diverse stories than
+an unguided LLM, and via code excerpts, we
+demonstrate the improved compactness and
+flexibility of ASP-based outline generation
+over full-fledged narrative planning.
+1
+Introduction
+Story generation research today has two major
+prongs: one that aims to use symbolic or rules-
+based AI methods (such as planning) to gener-
+ate plot outlines via hand-crafted bases of story
+structure knowledge, and one that aims to produce
+fully realized textual stories via large language
+models (LLMs). Both approaches have signifi-
+cant strengths and weaknesses. Planners are good
+at reasoning about long-term story structure and
+ensuring plot coherence (Riedl and Young, 2010;
+Cardona-Rivera et al., 2024), but narrative plan-
+ning domains are notoriously effortful to hand-
+engineer (Giannatos et al., 2012; Siler, 2022), and
+their fine-grained encoding of possible character
+actions and plot elements make them rigid in their
+adherence to a particular, narrow type of story.
+LLMs, on the other hand, are effective at open-
+domain story generation.
+However, they tend
+to struggle with long-term story coherence, of-
+ten failing to produce a satisfying overall story
+arc or reader experience (Kreminski and Martens,
+2022). Additionally, comparing LLM-generated to
+human-written stories reveals many aesthetic weak-
+nesses (Chakrabarty et al., 2024; Mirowski et al.,
+2023), in particular a tendency toward unoriginality
+or homogeneity in both the semantic and syntactic
+aspects of generated s
+--- Page 2 ---
+2
+Our Approach
+Broadly speaking, we generate stories via a two-
+step process. First, we plan a large and diverse
+set of potential story outlines by generating the
+full set of solutions to a small handwritten answer
+set program that encodes many viable sequences
+of storytelling goals (Fig. 1). Second, we choose
+an outline at random from this set and write a
+complete textual story that follows this outline via
+LLM, conditioning generation on a high-level story
+premise defined by a short string of text (Fig. 2).
+2.1
+Plan: Outline Pre-Generation with ASP
+In the plan phase, we make use of answer set pro-
+gramming (ASP) to generate diverse story outlines.
+ASP is a form of constraint solving that employs
+an answer set solver to generate all stable mod-
+els (Gelfond and Lifschitz, 1988), or sets of facts,
+that satisfy a set of (generally hand-written) logical
+constraints (Brewka et al., 2011).
+ASP is widely used in procedural content gen-
+eration research to generate artifacts ranging from
+story outlines to game levels (Smith and Mateas,
+2011).
+Generally speaking, ASP-for-PCG ap-
+proaches break down a generative answer set pro-
+gram into two components; the first part defines the
+basic elements that can be combined to form valid
+artifacts, and the second part defines constraints
+that restrict how these elements are allowed to be
+combined. In our case, we model story outlines as
+consisting of a sequence of scenes, each of which
+describes what happens at a certain time point in
+the story, and each of which fulfills some story-
+telling goal or narrative function related to what
+the story’s author is trying to convey.
+Timeline and Scenes
+We divide the story time-
+line into a sequence of scenes, for example, seven
+scenes, which we found to be long enough to create
+an interesting narrative. In ASP, this is written as:
+#const num_scenes = 7.
+scene(1..num_scenes).
+Our current implementation ultimately translates
+each scene to a single paragraph of story text, but
+scenes could also be rendered as shorter or longer
+spans of text; as sequences of panels in a comic; as
+clips of video making up a movie; and so on.
+Narrative Functions
+Narrative functions are the
+atomic units of story outlines, representing what
+storytelling goal the system is trying to accomplish
+in each scene. In our current implementation, each
+scene performs exactly one narrative function:
+{ scene_performs_func(S,F)
+: function(F) } = 1 :- scene(S).
+So far we have used a relatively minimal set of
+example narr
+--- Page 3 ---
+Figure 1: To generate diverse story outlines via ASP, we first specify a set of high-level narrative functions or
+storytelling goals that each scene in a story might fulfill. We then define a set of constraints that restrict how these
+narrative functions are allowed to be sequenced and combined. Finally, using an answer set solver, we solve for the
+set of all valid story outlines that can be produced given the specified narrative functions and constraints.
+To maximize the diversity of generated outlines,
+we intentionally specify only a minimal set of con-
+straints.
+Our example outline generator makes
+use of just fifteen total constraints, each consist-
+ing of no more than three lines of ASP code. Be-
+cause story outlines are ultimately translated into
+complete stories by an LLM, ASP constraints do
+not necessarily have to prevent every problem that
+might arise in narrative function sequencing: they
+only need to prevent problems that the LLM is un-
+able to acceptably “write around”, which can be
+identified through iterative testing and refinement
+of the full ASP-to-LLM story generation pipeline.
+Though we do not do so here, constraints could
+also be used to restrict outline generation accord-
+ing to user preferences. For example, a constraint
+might be used to force generation of outlines that
+contain at least a certain amount of bonding be-
+tween characters. An interactive story generation
+tool based on our approach might even provide a
+user interface for enabling and disabling various
+optional constraints.
+Implementation
+We implement ASP functional-
+ity using the clingo library (Gebser et al., 2011).
+Having defined an answer set program that de-
+scribes the design space of valid story outlines,
+we run the answer set solver to generate all possi-
+ble outlines that satisfy the given rules. We then
+save these outlines to a file for later use. Our initial
+evaluation involved the pregeneration of a set of
+401,990 distinct outlines.
+2.2
+Write: Story Generation with LLM
+In the write phase, we use an LLM to expand an
+outline generated via ASP to a complete written
+story. This phase takes two key inputs:
+1. User input: a short textual premise prompt
+that describes the high-level premise of the
+story to be generated.
+2. Outline: a randomly selected story outline
+from the pre-generated outline pool. In our
+current implementation, an outline consists
+of a sequence of seven narrative functions,
+one function for each scene. Each scene will
+be written out as one paragraph
+--- Page 4 ---
+character who would fit organically. Consider how
+this character’s presence can be connected to the
+current plot, setting, or other characters. Craft a
+scene or situation that allows for a smooth inte-
+gration of this character, ensuring that their intro-
+duction doesn’t feel forced or disconnected from
+the narrative. Provide context for their sunny and
+brave nature through their actions, dialogue, or
+the reactions of other characters, while maintain-
+ing the flow and consistency of the story. This
+character’s introduction should contribute to the
+development of the plot or the growth of other char-
+acters in a meaningful way, while maintaining the
+flow and consistency of the story”.
+2.2.2
+Generate Story Using Prompts
+We use the gpt-3.5-turbo LLM, via the OpenAI
+API, to render a selected outline into a full story. A
+consistent system prompt is used to set the context
+for the LLM, instructing it to act as a fiction writer.
+For the first paragraph of the generated story, the
+model is prompted with the story premise as well
+as the appropriate writing instruction for the first
+narrative function in the outline: “You’re writing a
+story about: {premise}. Write the first paragraph
+of the story. In this paragraph, {instruction}.” The
+resulting paragraph is then appended to the conver-
+sation history.
+For subsequent paragraphs, the same process is
+repeated, using a slightly modified story continu-
+ation prompt: “Write the next paragraph of the
+story. Remember the story is about: {premise}. In
+this paragraph, {instruction}.” The complete con-
+versation history is fed into subsequent paragraph
+generation requests as additional context, and the
+newly generated paragraph is then appended to the
+conversation history. This process is repeated until
+every entry in the story outline has been expanded
+to a full paragraph of text.
+2.3
+Baseline: Unguided Generation
+In addition to an ASP-guided LLM-based story gen-
+erator, we also implement an unguided LLM-based
+generator as a baseline for evaluation. This baseline
+generator follows a nearly identical process to that
+described above, with one key difference: the para-
+graph generation prompts issued to the baseline
+generator do not include the translated instructions
+from the outline. Instead, they rely solely on the
+user-supplied premise to guide story generation.
+3
+Evaluating Story Diversity
+3.1
+Procedure
+We evaluate our approach by generating parallel
+sets of ten stories each using our (ASP-guided)
+approach and a naïve (ung
+--- Page 5 ---
+Figure 2: Our overall approach to ASP-guided story generation first takes in a premise prompt—a brief textual
+description of the high-level premise of the story to be generated—and a randomly selected outline from a set of
+valid outlines generated via ASP. We then translate the sequence of narrative functions defined by the outline to a
+sequence of story continuation prompts. These prompts are fed sequentially into the LLM to generate a sequence of
+paragraphs, each one taking into account the high-level story premise; the text of the story so far; and the narrative
+function that this scene (i.e., paragraph) must fulfill. The baseline (unguided) approach is identical, but uses a
+neutral story continuation prompt for each paragraph instead of taking a pre-generated story outline into account.
+Figure 3: Comparative paragraph-by-paragraph homogeneity scores for stories generated around six different
+premises, using both an ASP-guided (blue) and an unguided (red) approach. For each premise, we generated a set
+of ten seven-paragraph stories using each approach, then visualized how semantically homogenous these story sets
+were at each paragraph. Lower homogeneity scores are better; the maximum possible score is 1 (all stories in the set
+are identical) and the minimum possible score is 0 (stories share nothing in common whatsoever).
+5
+
+--- Page 6 ---
+We use the pretrained all-MiniLM-L6-v2 sen-
+tence embedding model to conduct semantic simi-
+larity calculations. This model has proven to align
+relatively well with human judgments of semantic
+similarity in a divergent ideation context (Anderson
+et al., 2024), and the general class of transformer-
+based sentence embedding models to which this
+model belongs has been shown to outperform word
+embedding models that were previously evaluated
+as the gold standard for semantic similarity calcu-
+lation in creativity research (Beaty and Johnson,
+2021; Dumas et al., 2021). all-MiniLM-L6-v2 is
+available as part of the open source SentenceTrans-
+formers library (Reimers and Gurevych, 2019), sup-
+porting replication of our evaluation approach.
+3.2
+Results
+In general, we found that our ASP-guided approach
+consistently generated more semantically diverse
+sets of stories than an unguided approach, regard-
+less of premise and paragraph number (Fig. 3).
+Some premises benefited more from ASP guid-
+ance than others; for instance, stories generated
+in response to the “Cold Emu War” premise were
+much more diverse when ASP guidance was em-
+ployed. Although the reason for these premise-
+level differences are not yet clear to us, they seem
+consistent across multiple different evaluation runs:
+for instance, story sets produced in response to
+the “cat pirate” premise consistently seem to bene-
+fit the least from ASP guidance in terms of diver-
+sity. Perhaps this is because, during pretraining, the
+LLM was exposed to more closely relevant training
+data for some of our evaluated story premises than
+for others; this could give the LLM an especially
+strong prior for what stories that respond to cer-
+tain premises “should” look like, resulting in ASP
+guidance exerting less of an effect on overall story
+direction for these premises.
+We also observed that earlier paragraphs tended
+to be more homogenous than later paragraphs re-
+gardless of whether ASP guidance was used. How-
+ever, this trend was relatively weak and did not hold
+across all premises. Insofar as later paragraphs are
+more diverse than earlier paragraphs, this may be
+because later paragraphs are generated in the con-
+text of more preceding text, so minor differences
+in earlier paragraphs may “pile up” and be rein-
+forced in later paragraphs as the later paragraphs
+become progressively more conditioned on earlier
+story contents.
+4
+Limitations and Future Work
+Evaluation limitations
+Human readers are the
+ultimate arbiters of story
+--- Page 7 ---
+5
+Related Work
+In the procedural content generation research com-
+munity, ASP is widely used to specify design
+spaces of creative artifacts (Smith and Mateas,
+2011). We are aware of two prior approaches to
+generating story outlines with ASP: one that lever-
+ages an ASP encoding of event calculus (Chen
+et al., 2010) and one that encodes a traditional nar-
+rative planner as an answer set program (Dabral
+and Martens, 2020). Both of these approaches dif-
+fer from ours in that they use ASP to generate
+sequences of plot events; consequently, the result-
+ing answer set programs are relatively complicated
+due to the need to explicitly encode every action
+that a character might potentially take, including
+associated preconditions and postconditions. Our
+approach, on the other hand, uses ASP to generate
+sequences of storytelling goals; fewer constraints
+are needed to specify valid outlines in this looser
+formalism, resulting in a much simpler program.
+Luminate (Suh et al., 2024) introduces a new
+purely LLM-based plan-and-write approach that
+explicitly aims to generate diverse sets of stories.
+Given an initial premise, the system first uses an
+LLM to generate dimensions of a design space
+for stories that address this premise; then uses the
+LLM again to generate possible values for those
+dimensions; then uses it a third time to generate a
+structured set of stories that combine these values
+in diverse ways. This bears some resemblance to
+how we explicitly construct a design space of story
+outlines with ASP, and is in fact more flexible than
+our approach, but does not admit the specification
+of constraints that disallow certain combinations of
+values (which ASP readily permits).
+Outside of plan-and-write (i.e., prompting-
+focused) approaches, several attempts have also
+been made to improve the diversity of LLM-
+generated text via more general, model-focused
+approaches.
+These approaches include the use
+of diverse decoding methods to extract more
+diverse outputs from a fixed LLM (Ippolito
+et al., 2019); quality-diversity approaches such as
+QDAIF (Bradley et al., 2024); and finetuning ap-
+proaches to force the generation of “diffuse distrib-
+tions” in contexts where output diversity is desir-
+able (Zhang et al., 2024). All of these approaches
+are promising in their own right for improving out-
+put diversity, though they do not tend to provide
+new control affordances for story generation in the
+same way as plan-and-write approaches.
+6
+Conclusion
+We have demonstrated the use
+
+
+===== multi agent framework for long story.pdf (9 pages) =====
+--- Page 1 ---
+arXiv:2506.16445v1  [cs.CL]  19 Jun 2025
+STORYWRITER: A Multi-Agent Framework for Long Story Generation
+Haotian Xia*, Hao Peng∗, Yunjia Qi, Xiaozhi Wang, Bin Xu, Lei Hou, Juanzi Li
+Department of Computer Science and Technology, BNRist, Tsinghua University
+{xiaht24,peng-h24}@mails.tsinghua.edu.cn
+Abstract
+Long story generation remains a challenge for
+existing large language models (LLMs), pri-
+marily due to two main factors: (1) discourse
+coherence, which requires plot consistency,
+logical coherence, and completeness in the
+long-form
+generation,
+and
+(2)
+narrative
+complexity, which requires an interwoven
+and engaging narrative.
+To address these
+challenges, we propose STORYWRITER, a
+multi-agent story generation framework, which
+consists of three main modules: (1) outline
+agent, which generates event-based outlines
+containing rich event plots, character, and
+event-event relationships. (2) planning agent,
+which further details events and plans which
+events should be written in each chapter to
+maintain an interwoven and engaging story. (3)
+writing agent, which dynamically compresses
+the story history based on the current event to
+generate and reflect new plots, ensuring the
+coherence of the generated story. We conduct
+both human and automated evaluation, and
+STORYWRITER
+significantly
+outperforms
+existing story generation baselines in both
+story quality and length. Furthermore, we use
+STORYWRITER to generate a dataset, which
+contains about 6, 000 high-quality long stories,
+with an average length of 8, 000 words. We
+train the model Llama3.1-8B and GLM4-9B
+using supervised fine-tuning on LONGSTORY
+and
+develop
+STORYWRITERLLAMA
+and
+STORYWRITERGLM,
+which
+demonstrates
+advanced performance in long story generation.
+All code, models, and data are made publicly
+available1 to encourage reproducibility and
+further development.
+1
+Introduction
+Story generation aims to automatically produce co-
+herent, organized, and engaging narratives (Wang
+et al., 2023c). Typically, story generation involves
+*
+Equal contribution.
+1https://github.com/THU-KEG/StoryWriter
+[0,4k)
+[4k,10k)
+[10k,20k)
+Required story length
+20
+30
+40
+50
+60
+70
+80
+90
+100
+Scores (%)
+LongWriter_GLM
+GPT-4o
+STORYWRITER_GLM
+Figure 1: Results on MoPS (Ma et al., 2024) with dif-
+ferent required story lengths. Details are placed in § 4.
+using a premise, often a brief beginning or theme,
+as input to create a complete narrative (Alhussain
+and Azmi, 2021). Since the emergence of large
+language models (LLMs; Ouyang et al., 2022),
+--- Page 2 ---
+ules: (1) outline agent, which generates event-
+based outlines. Generating outlines is a typical
+procedure in story generation, previous studies
+adopt LLMs to directly generate outlines (Wang
+et al., 2023b; Yang et al., 2023a; Wang et al., 2024),
+which may be insufficiently specific and diverse.
+Inspired by conventional event knowledge (Wang
+et al., 2023a), we adopt an agent to generate a de-
+tailed event graph, where each node represents an
+event, and edges represent relationships between
+events, such as causal relationships (Wang et al.,
+2022). Each event is associated with several charac-
+ters (Wang et al., 2023a). We then adopt an agent to
+validate the consistency of each event and produce
+the final outline. (2) planning agent, which gener-
+ates detailed sub-events and globally plans which
+events should appear in each chapter to maintain
+an interwoven and engaging story. Specifically,
+we first use LLMs to generate sub-events for each
+event to provide richer event information. Human
+writing is non-linear, with events and characters
+often linked in diverse ways across different chap-
+ters (Oller Jr, 1983; Alkaaf and Al-Bulushi, 2017).
+We also employ an LLM to globally plan which
+events and characters should appear in each chap-
+ter, ensuring consistency and enabling the reap-
+pearance of key elements across chapters. This
+helps mitigate homogeneity and promotes the cre-
+ation of interwoven content. (3) writing agent,
+which generates and refines specific story content
+based on the historical context. Long story genera-
+tion involves long-range dependencies and directly
+feeding the entire history to the LLM may result
+in missing key information (Liu et al., 2024a), we
+adopt an agent named Coordinator to dynamically
+compress the previous writing history based on the
+current event. The goal of compression is to re-
+tain only relevant events and characters and create
+a compact and effective writing history for gener-
+ating a more coherent story. We then input this
+history with an event requiring expansion to the
+final writer to generate a sub-story, and then refine
+it using the Coordinator.
+We conduct extensive experiments to validate
+the effectiveness of STORYWRITER. We adopt
+GPT-4o-mini (OpenAI, 2024a) as the backbone to
+implement STORYWRITER. We conduct evalua-
+tion on the widely used MoPS dataset (Ma et al.,
+2024). We also investigate several strong base-
+lines, including DOC (Yang et al., 2023b), Agents’
+Room (Huot et al., 2024), and GPT-4o-mini (Ope-
+nA
+--- Page 3 ---
+Generate a 10,000-word story about: a battle-
+hardened veteran and his loyal comrade …
+Event1: The Ambush
+ 
+Good and next
+Event 2: The Betrayal Revealed
+Setting: A secluded mountain ridge at dusk. …
+Bad and I suggest ……
+Event N:  …
+…
+EventSeed
+EventValidator
+SubTasker
+Weaver
+Event1
+Event2
+…
+Sub-Event1.1
+Sub-Event1.2
+Sub-Event1.3
+…
+Sub-Event1.1
+Sub-Event2.1
+Sub-Event1.3
+Chapter1
+Sub-Event1.2
+Sub-Event2.2
+…
+Chapter2
+…
+Writing Agent
+Planning Agent
+Outline Agent
+Coordinator
+FinalWriter
+Please generate the 
+next story according to
+Story1.1: The fog clung to the trees like a 
+shroud, an unnatural stillness …
+Didn‘t write it well; let me rewrite it: …
+Story1.2: The chaos of the ambush erupted 
+like a tidal wave, sweeping over them with 
+relentless fury.
+Final Story
+…
+…
++
+History dialogue 
+Premise
+Outline
+Chapter
+Story
+Next Chapter
+NLN
+Re-IO
+Time:Night
+Location:Forest
+Character:Veteran
+Goal:Survive
+Figure 2: An overview of the three-stage story generation framework. The process consists of (from left to right): (1)
+event-based outline generation by the Outline Agent, (2) chapter construction using Non-Linear-Narration (NLN)
+by the Planning Agent, and (3) final story synthesis via ReIO (Re-write Input and Output) by the Writing Agent.
+Each stage employs a distinct methodology to progressively refine the narrative from high-level structure to detailed,
+coherent story text.
+2.2
+Outline Agents
+For event-centric outline generation, our frame-
+work employs two specialized agents: EventSeed
+and EventValidator. The EventSeed agent gener-
+ates events sequentially based on the given premise,
+incrementally constructing the story outline by pro-
+viding essential information for each event, such as
+time, location, and relationships. Meanwhile, the
+EventValidator agent continuously monitors and
+evaluates the generated outline, offering feedback
+to ensure that each event is both plausible and nar-
+ratively coherent, and guiding the generation of
+subsequent events. Distinct from conventional out-
+line generation approaches that produce descriptive
+sentences, our method structures the outline as a
+sequence of event tuples, thereby enhancing both
+controllability and logical consistency.
+2.3
+Planning Agents
+Enhancing flexibility and engagement in automated
+narrative generation remains a significant challenge.
+To address this, we introduce a novel Non-Linear
+Narration (NLN) strategy that decomposes events
+into sub-events and strategically distributes them
+across chapters.
+Grounded in
+--- Page 4 ---
+both narrative diversity and reader engagement.
+2.4
+Writing Agents
+In the final generation phase, the collaborative
+interaction between the Coordinator and Final-
+Writer agents is pivotal for producing narratives
+that are both coherent in structure and consistent in
+style. The Coordinator agent assumes responsibil-
+ity for overseeing the global narrative architecture,
+engaging in all stages from outline formulation
+and sub-event planning to the ultimate text gen-
+eration. In contrast, the FinalWriter agent is pri-
+marily dedicated to synthesizing the final narrative,
+with a particular emphasis on ensuring stylistic
+uniformity and high textual quality. This division
+of labor ensures that both macro-level structural
+coherence and micro-level narrative fluency are
+achieved. Despite these collaborative efforts, re-
+cent studies (Yao et al., 2024) and our preliminary
+experiments have identified a critical challenge in
+long-form story generation: large language mod-
+els (LLMs) exhibit significant context fragmenta-
+tion and attention degradation when processing ex-
+tended input sequences. Specifically, when the
+input length exceeds approximately 10,000 char-
+acters, the model’s capacity to maintain narrative
+focus and recall earlier plot developments dimin-
+ishes substantially, frequently resulting in off-topic
+or incoherent outputs. This limitation presents a
+substantial obstacle to the generation of lengthy,
+cohesive narratives.
+To address this issue, we propose the Re-write In-
+put and Output(ReIO) mechanism within the writ-
+ing agents. During input processing, the Coordi-
+nator dynamically summarizes and condenses the
+historical narrative context, selectively retaining
+only information pertinent to the current sub-event.
+This strategy effectively reduces the input length
+while preserving essential contextual information,
+and the generated summaries are cached for effi-
+cient reuse in subsequent stages. During output
+processing, the Coordinator evaluates the gener-
+ated text and, if necessary, rewrites it to ensure
+alignment with the intended narrative structure and
+stylistic requirements. The revised output replaces
+the original, and this iterative rewriting process
+is repeated as needed to maintain both narrative
+coherence and stylistic consistency.
+By integrating the ReIO mechanism into the col-
+laborative workflow of the Coordinator and Final-
+Writer agents, our framework effectively mitigates
+the challenges associated with long-context pro-
+cessing in LL
+--- Page 5 ---
+Model
+Average
+RE
+CH
+EM
+SU
+CR
+CX
+Average Length
+DOC
+Human-Eval
+3.7
+4.2
+4.3
+3.2
+3.4
+3.7
+3.2
+2, 373
+Auto-Eval
+3.9
+4.1
+4.3
+4.0
+3.5
+3.8
+3.5
+Agents’ Room
+Human-Eval
+3.8
+4.5
+4.4
+3.3
+3.2
+3.7
+4.0
+3, 134
+Auto-Eval
+3.9
+3.5
+4.5
+4.0
+3.7
+3.9
+3.7
+GPT-4o mini
+Human-Eval
+3.6
+4.0
+3.8
+3.3
+3.4
+3.6
+3.7
+1, 078
+Auto-Eval
+3.9
+4.0
+4.7
+4.1
+3.5
+3.7
+3.4
+STORYWRITER
+Human-Eval
+4.2
+4.4
+4.3
+3.8
+3.6
+4.3
+4.8
+8, 081
+Auto-Eval
+4.2
+4.1
+4.4
+4.4
+3.7
+4.2
+4.6
+Table 1: Experimental results of human and automatic scoring (on a scale from 1 to 5). RE, CH, EM, SU, CR, and
+CX represent relevance, coherence, empathy, surprise, creativity, and complexity, respectively. Bold indicates the
+best result according to human evaluation, and underline indicates the best result according to automatic evaluation.
+Model
+Average
+RE
+CH
+EM
+SU
+CR
+CX
+STORYWRITER
+4.3
+4.1
+4.4
+4.4
+3.7
+4.2
+4.6
+(-) Events-Outlines
+2.5
+2.2
+3.2
+2.9
+2.2
+3.3
+1.1
+(-) Planning
+3.9
+4.0
+4.6
+4.0
+3.1
+3.9
+3.8
+(-) ReIO-Input
+3.9
+4.1
+4.6
+3.9
+3.2
+3.9
+3.9
+(-) ReIO-Output
+4.0
+3.7
+4.2
+4.6
+4.0
+3.7
+3.9
+Table 2: “(-)ReIO-Output” removes the output rewriting mechanism of Writing Agents. (-)Planning removes
+the Non-Linear Narration (NLN) strategy of Planning Agents. (-)ReIO-Input removes ReIO input rewriting
+mechanismof Writing Agents. (-)Events-Outline removes event-based outlining of the Outline Agents, reducing the
+story outline to a few generic sentences without detailed event descriptions. Bold indicates the best result according
+to auto evaluation
+Room is a multi-agent framework for story gen-
+eration. This approach introduces an orchestrator
+responsible for determining when to invoke the
+writer agent and the planner agent, thereby ensuring
+coordinated execution among agents. However, ex-
+perimental results in the original work indicate that,
+under the given experimental settings, the most ef-
+fective strategy is a deterministic orchestrator that
+sequentially calls the agents in a predefined order.
+Accordingly, for consistency and comparability, we
+also adopted this deterministic orchestrator in our
+experiments. (3) GPT-4o mini. We directly input
+the premise into GPT-4o-mini to generate the story.
+3.2
+Experimental Results
+Main Results
+All the experimental results are
+presented in Table 1. We observe the following: (1)
+In general, our story generation framework STO-
+RYWRITER significantly outperforms the baselines
+in both human and automated evaluations, demon-
+strating its effectiveness. (2) STORYWRITER sig-
+nificantly surpasses previous baselines in term
+--- Page 6 ---
+expected, as the Planning Agents module enhances
+narrative diversity by distributing sub-events across
+different chapters while preserving event relation-
+ships. (-ReIO-Input): In this setting, ReIO-input
+of Writing Agents is removed, meaning neither the
+input nor output is effectively regulated. Conse-
+quently, the input length for the agent increases
+substantially, leading to higher computational costs
+and a decline in overall performance.
+(-ReIO-
+Output): This setting removes the ReIO output
+rewriting mechanism in Writing Agents. In this
+case, the relevance score of the generated text drops
+significantly. This decline occurs because the ReIO
+output module plays a crucial role in maintaining
+structural coherence by rewriting sections that de-
+viate from the original outline.
+3.3
+Analysis on Summary Context
+As the length of generated text increases, LLMs are
+prone to undesirable phenomena such as repetition,
+hallucination, and topic drift (Liu et al., 2024a).
+These issues typically manifest as redundant event
+narration, protagonist actions that diverge from the
+established narrative trajectory, and a breakdown in
+logical story progression relative to prior content.
+Our analysis reveals a strong correlation between
+these problems and the length of the preceding con-
+text. To mitigate these effects, we introduce a sum-
+mary agent that condenses the input context while
+preserving essential information. Specifically, we
+implement a sliding window mechanism: as events
+are generated sequentially, the window advances,
+and the content within its range is systematically
+simplified.
+A critical aspect of this approach is determin-
+ing a strategy that optimally balances input length
+reduction with the preservation of narrative coher-
+ence. Through empirical evaluation of various win-
+dow lengths, we observe that for texts under 15,000
+tokens, a sliding window spanning [2, k-1] consis-
+tently yields optimal results, indicating that sim-
+plifying the central portion of the context is most
+effective.
+To further substantiate our findings, we conduct
+a controlled experiment comparing five sliding win-
+dow configurations: [k-10, k-8], [k-12, k-6], [k-14,
+k-4], the baseline [2, k-1], and an empty set. Hu-
+man evaluators assess the narrative quality of the
+generated stories, with results presented in Figure 3.
+Our findings demonstrate that maximal simplifica-
+tion of prior content leads to superior narrative
+outcomes, as indicated by the best average perfor-
+Figure 3: Result
+--- Page 7 ---
+Overall
+[0, 1k)
+[1k, 2k)
+[2k, 4k)
+[4k, 10k)
+[10k, 20k)
+¯S
+Sl
+Sq
+Sl
+Sq
+Sl
+Sq
+Sl
+Sq
+Sl
+Sq
+Sl
+Sq
+Llama3.1-8B-Instruct
+46.6
+34.5
+2.9
+89.0
+4.0
+83.7
+3.9
+0.0
+3.5
+0.0
+2.2
+0.0
+1.0
+GLM4-9B
+47.3
+36.6
+2.9
+93.7
+4.2
+89.6
+4.0
+0.0
+3.3
+0.0
+2.0
+0.0
+1.0
+LongWriter-GLM4-9B
+76.3
+83.0
+3.5
+86.9
+3.1
+93.1
+3.2
+91.6
+4.0
+86.9
+3.6
+56.7
+3.4
+LongWriter-Llama3.1-8B
+77.9
+83.6
+3.6
+96.9
+3.9
+96.1
+3.5
+93.2
+4.1
+81.9
+3.5
+51.3
+3.2
+Deepseek-Llama-8B
+70.0
+73.6
+3.3
+92.3
+3.1
+91.9
+3.2
+88.2
+3.6
+83.2
+3.4
+12.3
+3.3
+Deepseek-Llama-70B
+74.3
+79.0
+3.5
+93.2
+3.3
+94.5
+3.4
+87.2
+4.0
+81.0
+3.5
+44.1
+3.2
+GPT-4o
+67.4
+52.8
+4.1
+92.3
+4.7
+91.7
+4.5
+62.0
+4.3
+15.3
+3.7
+2.7
+3.3
+STORYWRITERLLAMA
+73.4
+75.3
+3.5
+90.8
+3.9
+94.1
+3.8
+77.3
+3.5
+77.0
+3.4
+27.7
+3.4
+STORYWRITERGLM
+83.7
+88.5
+3.9
+99.5
+4.4
+99.3
+4.1
+98.0
+4.0
+88.7
+3.5
+57.3
+3.6
+Table 3: Experimental results (%) of STORYWRITERLLAMA, STORYWRITERGLM and the baselines. Sq represents
+the average score of the 6 dimensions, as described in § 3.1. Sl is the length score, calculated using Equation 1. ¯S is
+computed as (Sq + 20 × Sl)/2, following the approach used by Bai et al. (2024b).
+setting different output length constraints, which
+not only assesses the model’s ability to generate
+long texts but also evaluates its adherence to word
+count constraints. The length score computes the
+degree of alignment between the actual response
+length and the required length in the instruction,
+which can be computed as follows:
+Sl =
+
+
+
+100 · max
+
+0, 1 −(l′/l−1)
+3
+
+if l′ > l,
+100 · max
+
+0, 1 −(l/l′−1)
+2
+
+if l′ ≤l.
+(1)
+l′ denotes the actual response length and l de-
+notes the required length. Specifically, we adopt
+the same evaluation settings as LongBench-Write:
+for each instruction in the MoPS test set, we add an
+output length constraint from {500, 1, 000, 2, 000,
+4, 000, 10, 000}, and then generate response for
+each length constraint and compute the final scores.
+We bucket the results based on lengths and report
+the average of the following metrics within each
+bucket: Sq, which evaluates content quality (the
+average of the 6 dimensional scores from § 3.1),
+Sl, which evaluates the length score, and ¯S, which
+equals (Sq +20∗Sl)/2. We also report the average
+overall score across all lengths.
+SFT Training
+We leverage the Llama 3.1-8B
+model and GLM-4-9B model as the base model
+for SFT training.
+We use the training code
+proposed by LongAlign (Bai et al., 2024a), as it
+is specifically designed for long-context training
+with pre-existing long-context adaptations. We use
+the premise of each instance in 
+
+
+===== plan_write_revise.pdf (9 pages) =====
+--- Page 1 ---
+Plan, Write, and Revise: an Interactive System
+for Open-Domain Story Generation
+Seraphina Goldfarb-Tarrant12, Haining Feng1, Nanyun Peng1
+1 Information Sciences Institute, University of Southern California
+2 University of Washington
+serif@uw.edu, haining@usc.edu, npeng@isi.edu
+Abstract
+Story composition is a challenging problem
+for machines and even for humans. We present
+a neural narrative generation system that in-
+teracts with humans to generate stories. Our
+system has different levels of human interac-
+tion, which enables us to understand at what
+stage of story-writing human collaboration is
+most productive, both to improving story qual-
+ity and human engagement in the writing pro-
+cess.
+We compare different varieties of in-
+teraction in story-writing, story-planning, and
+diversity controls under time constraints, and
+show that increased types of human collabo-
+ration at both planning and writing stages re-
+sults in a 10-50% improvement in story qual-
+ity as compared to less interactive baselines.
+We also show an accompanying increase in
+user engagement and satisfaction with stories
+as compared to our own less interactive sys-
+tems and to previous turn-taking approaches
+to interaction. Finally, we ﬁnd that humans
+tasked with collaboratively improving a partic-
+ular characteristic of a story are in fact able to
+do so, which has implications for future uses
+of human-in-the-loop systems.
+1
+Introduction
+Collaborative human-machine story-writing has
+had a recent resurgence of attention from the
+research community (Roemmele and Swanson.,
+2017; Clark and Smith, 2018).
+It represents a
+frontier for AI research; as a research community
+we have developed convincing NLP systems for
+some generative tasks like machine translation, but
+lag behind in creative areas like open-domain sto-
+rytelling. Collaborative open-domain storytelling
+incorporates human interactivity for one of two
+aims: to improve human creativity via the aid of a
+machine, or to improve machine quality via the aid
+of a human. Previously existing approaches treat
+the former aim, and have shown that storytelling
+systems are not yet developed enough to help hu-
+man writers. We attempt the latter, with the goal
+of investigating at what stage human collaboration
+is most helpful.
+Swanson and Gordon (2009) use an informa-
+tion retrieval based system to write by alternating
+turns between a human and their system. Clark
+and Smith (2018) use a similar turn-taking ap-
+proach to interactivity, but employ a neur
+--- Page 2 ---
+Topic
+Conﬁguration
+Storyline
+Stories
+Storyline 
+Planner
+Story 
+Writer
+System 1:
+Title-to-Story
+System 2: 
+Plan-and-Write
+System 3: 
+Plan-and-Revise
+Web Interface
+Figure 1: Diagram of human-computer interaction me-
+diated by the the demo system. The dotted arrows rep-
+resent optional interactions that the user can take. De-
+pending on the set-up, the user may choose to interact
+with one or all story models.
+man interaction with the computer. There is cross-
+model interaction, where the machine does all the
+composition work, and displays three different
+versions of a story written by three distinct models
+for a human to compare. The user guides genera-
+tion by providing a topic for story-writing and by
+tweaking decoding parameters to control novelty,
+or diversity. The second interface is intra-model
+interaction, where a human can select the model to
+interact with (potentially after having chosen it via
+cross-model), and can collaborate at all stages to
+jointly create better stories. The full range of inter-
+actions available to a user is: select a model, pro-
+vide a topic, change diversity of content, collabo-
+rate on the planning for the story, and collaborate
+on the story sentences. It is entirely user-driven,
+as the users control how much is their own work
+and how much is the machine’s at every stage. It
+supports revision; a user can modify an earlier part
+of a written story or of the story plan at any point,
+and observe how this affects later generations.
+2
+System Description
+2.1
+System Overview
+Figure 1 shows a diagram of the interaction sys-
+tem. The dotted arrows represent optional user in-
+teractions.
+Cross-model mode
+requires the user to enter a
+topic, such as “the not so haunted house”, and can
+optionally vary the diversity used in the STORY-
+LINE PLANNER or the STORY WRITER. Diversity
+numbers correspond directly to softmax tempera-
+tures, which we restrict to a reasonable range, de-
+termined empirically. The settings are sent to the
+STORYLINE PLANNER module, which generates
+a storyline for the story in the form of a sequence
+of phrases as per the method of Yao et al. (2019).
+Everything is then sent to the STORY WRITER,
+which will return three stories.
+Intra-model mode
+enables advanced interac-
+tions with one story system of the user’s choice.
+The STORYLINE PLANNER returns either one sto-
+ryline phrase or many, and composes the ﬁnal sto-
+ryline out of the combination of phrases the sys-
+tem generated, the user has written, and edits the
+user has ma
+--- Page 3 ---
+(a) cross-model interaction, comparing three models
+with advanced options to alter the storyline and story
+diversities.
+(b) intra-model interaction, showing advanced options and an-
+notated with user interactions from an example study.
+Figure 2: Screenshots of the demo user interface
+2.3
+Model Design
+All models for both the STORYLINE PLANNER
+and STORY WRITER modules are conditional lan-
+guage models implemented with LSTMs based on
+Merity et al. (2018). These are 3-stacked LSTMs
+that include weight-dropping, weight-tying, vari-
+able length back propagation with learning rate ad-
+justment, and Averaged Stochastic Gradient De-
+scent (ASGD). They are trained on the ROC
+dataset (Mostafazadeh et al., 2016), which after
+lowercasing and tokenization has a vocabulary of
+38k.
+Storyline Phrases are extracted as in Yao
+et al. (2019) via the RAKE algorithm (Rose et al.,
+2010) which results in a slightly smaller Storyline
+vocabulary of 31k. The STORYLINE PLANNER
+does decoding via sampling to encourage creative
+exploration. The STORY WRITER has an option to
+use one or all three systems, all of which decode
+via beamsearch and are detailed below.
+The Title-to-Story system is a baseline, which
+generates directly from topic.
+The Plan-and-Write system adopts the static
+model in Yao et al. (2019) to use the storyline to
+supervise story-writing.
+Plan-and-Revise is a new system that com-
+bines the strengths of Yao et al. (2019) and Holtz-
+man et al. (2018). It supplements the Plan-and-
+Write model by training two discriminators on the
+ROC data and using them to re-rank the LSTM
+generations to prefer increased creativity and rel-
+evance.4
+Thus the decoding objective of this
+system becomes fλ(x, y) = log(Plm(y|x)) +
+P
+k λksk(x, y) where Plm is the conditional lan-
+guage model probability of the LSTM, sk is
+the discriminator scoring function, and λk is the
+4Holtzman et al. (2018) use four discriminators, but based
+on ablation testing we determined these two to perform best
+on our dataset and for our task.
+learned weight of that discriminator.
+At each
+timestep all live beam hypotheses are scored and
+re-ranked.
+Discriminator weights are learnt by
+minimizing Mean Squared Error on the difference
+between the scores of gold standard and generated
+story sentences.
+3
+Experiments
+We experiment with six types of interaction: ﬁve
+variations created by restricting different capabil-
+ities of our system, and a sixth turn-taking base-
+line that mimics the interaction of the previous
+work (Clark 
+--- Page 4 ---
+tem can address speciﬁc shortcomings of gener-
+ated stories.
+We identify three types of weak-
+nesses common to generation systems – Creativ-
+ity, Relevance, and Causal & Temporal Coher-
+ence, and conduct experiments where the human is
+instructed to focus on improving speciﬁcally one
+of them. The targeted human improvement areas
+intentionally match the Plan-and-Revise discrimi-
+nators, so that, if successful, the ”human discrimi-
+nator” data can assist in training the machine dis-
+criminators. All experiments (save experiment 2,
+which lets the user pick between models) use the
+Plan-and-Revise system.
+3.1
+Details
+We recruit 30 Mechanical Turk workers per ex-
+periment (270 unique workers total) to complete
+story writing tasks with the system.6
+We con-
+strain them to ten minutes of work (ﬁve for writ-
+ing and ﬁve for a survey) and provide them with
+a ﬁxed topic to control this factor across exper-
+iments.
+They co-create a story and complete a
+questionnaire which asks them to self-report on
+their engagement, satisfaction, and perception of
+story quality.7 For the additional focused error-
+correction experiments, we instruct Turkers to try
+to improve the machine-generated stories with re-
+gard to the given aspect, under the same time con-
+straints. As an incentive, they are given a small
+bonus if they are later judged to have succeeded.
+We then ask a separate set of Turkers to rate the
+stories for overall quality and the three improve-
+ment areas. All ratings are on a ﬁve-point scale.
+We collect two ratings per story, and throw out rat-
+ings that disagree by more than 2 points. A total
+of 11% of ratings were thrown out, leaving four
+metrics across 241 stories for analysis.
+4
+Results
+User Engagement
+Self-reported scores are rel-
+atively high across the board, as can be seen in Ta-
+ble 1, with the majority of users in all experiments
+saying they would like to use the system again.
+The lower scores in the Diversity only and Story-
+line only experiments are elucidated by qualitative
+comments from users of frustration at the inability
+to sufﬁciently control the generations with inﬂu-
+ence over only those tools. Storyline only is low-
+6We enforce uniqueness to prevent confounding effects
+from varying levels of familiarity with the demo UI
+7Text of questionnaire and other Mechanical Turk materi-
+als are included in Appendix C
+Experiment
+E
+Q
+S
+Use Again
+Diversity only
+3.77
+2.90
+3.27
+1.40
+Storyline only
+4.04
+3.36
+3.72
+1.27
+Story only
+4.50
+3.17
+3.60
+1.60
+All
+4.41
+3.55
+3.7
+--- Page 5 ---
+in the Story only experiment, which contrasts with
+it being highest rated independently (as discussed
+below).
+Self-reported scores also suggest that
+users judge their stories to be much better when
+they have been focusing on causal-temporal coher-
+ence, though this focus carries over to a smaller
+improvement in independent rankings. While it is
+clear that additional interactivity is a good idea,
+the disjunct between user perception of their writ-
+ing and reader perception under different experi-
+ment conditions is worthwhile to consider for fu-
+ture interactive systems.
+Story Quality
+As shown in Table 2, human
+involvement of any kind under tight constraints
+helps story quality across all metrics, with mostly
+better results the more collaboration is allowed.
+The exception to this trend is Story only collabo-
+ration, which performs best or close to best across
+the board. This was unexpected; it is possible that
+these users beneﬁted from having to learn to con-
+trol only one model, instead of both, given the lim-
+ited time. It is also possible that being forced to be
+reliant on system storylines made these users more
+creative.
+Turn-taking Baseline
+The turn-taking baseline
+performs comparably in overall quality and rel-
+evance to other equally interactive experiments
+(Story only, All, All+). It achieves highest scores
+in relevance, though the top ﬁve systems for rele-
+vance are not statistically signiﬁcantly different. It
+is outperformed on creativity and causal-temporal
+coherence by the strong Story only variation, as
+well as the All, All+ systems. This suggests that
+local sentence-level editing is sufﬁcient to keep a
+story on topic and to write well, but that creativity
+and causal-temporal coherence require some de-
+gree of global cohesion that is assisted by iterative
+editing. The same observation as to the strength
+of Story only over All applies here as well; turn-
+taking is the least complex of the interactive sys-
+tems, and may have boosted performance from be-
+ing simpler since time was constrained and users
+used the system only once. Thus a turn-based sys-
+tem is a good choice for a scenario where users
+use a system infrequently or only once, but the
+comparative performance may decrease in future
+experiments with more relaxed time constraints or
+where users use the system repeatedly.
+Targeted Improvements
+The results within the
+All and All + setups conﬁrm that stories can be im-
+proved with respect to a particular metric. The di-
+agonal of strong score
+--- Page 6 ---
+References
+Anne Spencer Ross Chenhao Tan Yangfeng Ji Clark,
+Elizabeth and Noah A. Smith. 2018. Creative writ-
+ing with a machine in the loop: Case studies on slo-
+gans and stories. In 23rd International Conference
+on Intelligent User Interfaces (IUI).
+Ari Holtzman, Jan Buys, Maxwell Forbes, Antoine
+Bosselut, David Golub, and Yejin Choi. 2018.
+Learning to write with cooperative discriminators.
+In Proceedings of ACL.
+Philipp Koehn, Hieu Hoang, Alexandra Birch, Chris
+Callison-Burch, Marcello Federico, Nicola Bertoldi,
+Brooke Cowan,
+Wade Shen,
+Christine Moran,
+Richard Zens, et al. 2007.
+Moses: Open source
+toolkit for statistical machine translation.
+In Pro-
+ceedings of the 45th annual meeting of the ACL on
+interactive poster and demonstration sessions, pages
+177–180. Association for Computational Linguis-
+tics.
+Stephen Merity, Nitish Shirish Keskar, and Richard
+Socher. 2018. Regularizing and optimizing lstm lan-
+guage models.
+In Proceedings of the Sixth Inter-
+national Conference on Learning Representations
+(ICLR).
+George A. Miller. 1995. Wordnet: A lexical database
+for english. In Communications of the ACM Vol. 38.
+Nasrin Mostafazadeh, Nathanael Chambers, Xiaodong
+He, Devi Parikh, Dhruv Batra, Lucy Vanderwende,
+Pushmeet Kohli, and James Allen. 2016.
+A cor-
+pus and cloze evaluation for deeper understanding
+of commonsense stories. In Proceedings of NAACL-
+HLT, pages 839–849.
+Jeffrey Pennington, Richard Socher, and Christo-
+pher D. Manning. 2014. Glove: Global vectors for
+word representation. In Empirical Methods in Nat-
+ural Language Processing (EMNLP), pages 1532–
+1543.
+Andrew S. Gordon Roemmele, Melissa and Reid
+Swanson. 2017.
+Evaluating story generation sys-
+tems using automated linguistic analyses.
+In
+SIGKDD 2017 Workshop on Machine Learning for
+Creativity.
+Stuart Rose, Dave Engel, Nick Cramer, and Wendy
+Cowley. 2010. Automatic keyword extraction from
+individual documents. In Text Mining: Applications
+and Theory.
+Reid Swanson and Andrew S. Gordon. 2009. Say any-
+thing: A demonstration of open domain interactive
+digital storytelling. In Joint International Confer-
+ence on Interactive Digital Storytelling.
+Lili Yao, Nanyun Peng, Weischedel Ralph, Kevin
+Knight, Dongyan Zhao, and Rui Yan. 2019. Plan-
+and-write: Towards better automatic storytelling. In
+Proceedings of the thirty-third AAAI Conference on
+Artiﬁcial Intelligence (AAAI).
+
+--- Page 7 ---
+A
+Demo Video
+The three-minute video demonstrating the interac-
+tion capabilities of the system can be viewed at
+https://youtu.be/-hGd2399dnA. (Same
+video as linked in the paper footnote).
+B
+Training and Decoding Parameters
+B.1
+Decoding
+Default diversity (Softmax Temperature) for Sto-
+ryline Planner is 0.5, for Story Writer it is None
+(as beamsearch is used an thus can have but does
+not require a temperature).
+Beam size for all
+Story Writer models is 5. Additionally, Storyline
+Phrases are constrained to be unique (unless a user
+duplicates them), and Beamsearch is not normal-
+ized by length (both choices determined empiri-
+cally).
+B.2
+Training
+We follow the parameters used in Yao et al. (2019)
+and Merity et al. (2018).
+Parameter
+Storyline Model Story Models
+Embedding Dim
+500
+1000
+Hidden Layer Dim
+1000
+1500
+Input Embedding Dropout
+0.4
+0.2
+Hidden Layer Dropout
+0.1
+01
+Batch Size
+20
+20
+BPTT
+20
+75
+Learning Rate
+10
+10
+Vocabulary size
+31,382
+37,857
+Total Model Parameters
+32,489,878
+80,927,858
+Epochs
+50
+120
+Table 3: Training parameters for models used in demo.
+C
+User Study
+C.1
+Questionnaire
+Post Story Generation Questionnaire
+How satisﬁed are you with the ﬁnal story?
+What do you think is the overall quality of the ﬁnal story?
+Was the process entertaining?
+Would you use the system again?
+Table 4: Questionnaire for user self-reporting, range 1
+to 5 (1 low).
+C.2
+Mechanical Turk Materials
+Following are examples of the materials used in
+doing Mechanical Turk User Studies. Figure 3 is
+an example of the All + Creative focused exper-
+iment for story-writing. The instructions per ex-
+periment differ across all, but the template is the
+same. Figure 4 is the survey for ranking stories
+across various metrics. This remains constant save
+that story order was shufﬂed every time to control
+for any effects of the order a story was read in.
+
+
+
+===== storyteller.pdf (29 pages) =====
+--- Page 1 ---
+arXiv:2506.02347v1  [cs.CL]  3 Jun 2025
+STORYTELLER: An Enhanced Plot-planning Framework
+for Coherent and Cohesive Story Generation
+Jiaming Li1,2*
+Yukun Chen1,2*
+Ziqiang Liu1,2
+Minghuan Tan1
+Lei Zhang1,2
+Yunshui Li1,2
+Run Luo1,2
+Longze Chen1,2
+Jing Luo1
+Ahmadreza Argha3
+Hamid Alinejad-Rokny3
+Wei Zhou4†
+Min Yang1
+1Shenzhen Institutes of Advanced Technology, Chinese Academy of Sciences
+2University of Chinese Academy of Sciences
+3UNSW Sydney, Sydney, NSW, Australia 4Chongqing University
+{jm.li4, yk.chen2, min.yang}@siat.ac.cn
+Abstract
+Stories are central to human culture, serving
+to share ideas, preserve traditions, and foster
+connections. Automatic story generation, a
+key advancement in artificial intelligence (AI),
+offers new possibilities for creating personal-
+ized content, exploring creative ideas, and en-
+hancing interactive experiences. However, ex-
+isting methods struggle to maintain narrative
+coherence and logical consistency. This dis-
+connect compromises the overall storytelling
+experience, underscoring the need for substan-
+tial improvements. Inspired by human cogni-
+tive processes, we introduce STORYTELLER,
+a novel approach that systemically improves
+the coherence and consistency of automatically
+generated stories. STORYTELLER introduces
+a plot node structure based on linguistically
+grounded subject-verb-object (SVO) triplets,
+which capture essential story events and ensure
+a consistent logical flow. Unlike previous meth-
+ods, STORYTELLER integrates two dynamic
+modules—the STORYLINE and narrative entity
+knowledge graph (NEKG)—that continuously
+interact with the story generation process. This
+integration produces structurally sound, cohe-
+sive and immersive narratives. Extensive exper-
+iments demonstrate that STORYTELLER signifi-
+cantly outperforms existing approaches, achiev-
+ing an 84.33% average win rate through human
+preference evaluation. At the same time, it is
+also far ahead in other aspects including cre-
+ativity, coherence, engagement, and relevance.
+1
+Introduction
+"Stories make us more alive, more hu-
+man, more courageous, more loving."
+— Madeleine L’Engle
+Stories have always been integral to human so-
+ciety, serving as a means to share knowledge, en-
+tertain, and foster deeper emotional connections
+*Equal contribution.
+†Corresponding author.
+[Writing Prompt]: 
+Write a story about ``` The world 's highest security prison has …  never been any escapes .``` 
+[Generated Story]: 
+Deep in the heart of a dense and foreboding 
+jungle, far remov
+--- Page 2 ---
+To address these challenges, we draw inspira-
+tion from the cognitive process of human writers
+(Lamott, 1995; Cook, 2011). Consider a writer
+crafting a complex story: they continuously re-
+trieve past events, evaluate how new developments
+align with established narrative elements, and gen-
+erate content that integrates seamlessly into the
+evolving plot (Clark, 2008; Brande, 2013). This
+cognitive loop—Retrieval, Evaluation, and Genera-
+tion—ensures natural story evolution, where each
+event logically builds on prior context.
+Building on this insight, our proposed frame-
+work, STORYTELLER, introduces an adaptive plot-
+planning mechanism for story generation. Unlike
+prior methods, STORYTELLER enables continuous
+interaction among plot points during generation, en-
+suring cohesive narrative structure. Central to our
+approach is a dynamic plot node mechanism that
+tracks key events and character interactions through
+subject-verb-object (SVO) triplets, augmented by
+a storyline and narrative entity knowledge graph.
+This design preserves logical flow and thematic
+consistency while offering granular control over
+plot progression, enhancing both coherence and
+depth.
+Highlights of our contributions are as follows:
+• A novel plot node structure using SVO triplets
+to capture story events, ensuring logical pro-
+gression and thematic continuity, key to co-
+herent long-form narratives.
+• Two dynamically integrated modules: the
+STORYLINE and narrative entity knowledge
+graph (NEKG), which interact bidirection-
+ally with the generation process to systemati-
+cally refine plot structure and event coherence
+across narrative stages.
+• Empirical validation demonstrating that STO-
+RYTELLER significantly outperforms existing
+models, generating stories with superior co-
+herence, creativity, engagement, and overall
+quality.
+2
+Related Work
+Large Language Models.
+The emergence of
+LLMs has revolutionized NLP (Vaswani et al.,
+2017; Brown, 2020; Zhang et al., 2023). Early
+architectures like BERT (Devlin et al., 2019) and
+the Transformer (Vaswani et al., 2017) laid the
+groundwork for advanced successors such as GPT-
+4 (Achiam et al., 2023), Llama-3 (AI@Meta, 2024),
+and Qwen (Bai et al., 2023), which are distin-
+guished by their scalability and versatility. These
+models serve as foundational platforms for diverse
+applications, excelling in tasks like machine trans-
+lation, text summarization, and conversational AI.
+Their capacity to generate coherent and contex-
+tually relevant text has driven
+--- Page 3 ---
+Add CPNi to  
+Storyline and NEKG
+### Chapter 1: The Diagnosis\n\nAlex's 
+life had always been a collection of 
+ordinary routines, each day resembling the 
+one before. They lived in a modest 
+apartment in the heart of the city, where 
+the hustle and bustle outside contrasted 
+sharply with …
+Storyline
+NEKG
+Write a story about ``` The world 's highest security 
+prison has no fences …  never been any escapes .``` 
+①Premise and Synopsis Generation
+[Premise]: Set in the contemporary world, the story 
+follows an average individual who discovers…
+[Synopsis]: The protagonist, Alex, has always con-
+sidered themselves an average person, navigating …
+②Chapter Titles and Abstracts Generation
+Chapter n Title & Abstract
+③CBN and CEN Generation
+CBN: < Alex, live, routine life >
+CEN: < Alex, decide, undergo surgery >
+Modules
+Add CBN to Storyline and NEKG
+④Pseudo CPNi Generation
+CPNs[-1] == CEN?
+CPNs: [ ]
+No
+Pseudo CPNi:  <Alex,  visit, doctor>
+⑤Pseudo CPNi Review
+CBN
+CEN
+CPN[: i-1]
+[In]:
+CBN
+CEN
+Pseudo CPNi
+[In]:
+Related Nodes
+Recent Events
+CPNi = Pseudo CPNi
+CPNi = Modified CPNi
+Review by LLM
+OR
+Add CPNi to CPNs
+Extract recent events 
+from Storyline
+Extract Nodes related to  
+Pseudo CPNi from NEKG
+Yes
+⑥Text Block Generation
+CBN
+CEN
+CPNs
+[In]:
+Chapter Title & Abstract
+Previous Text Block
+Add Text Block to Text Block List
+When all Text Blocks are generated,  
+concat them to get the story.
+Chapter 1 Title & Abstract
+Chapter 2 Title & Abstract
+…
+Alex
+Doctor
+S
+V
+O
+time_stamp
+Stage 1: High-Level Story Generation
+Stage 3: Detailed Story Writing
+Stage 2: Mid-Level Plot Structuring
+Figure 2: Overview of STORYTELLER. The method is divided into three stages. This figure illustrates the complete
+process by which STORYTELLER transforms user input into the final story. Additionally, it highlights the information
+interaction between various stages and both the STORYLINE and NEKG module.
+ing, which enables task execution based solely on
+prompt content without requiring parameter up-
+dates (Dong et al., 2022; Wei et al., 2022). This
+capability grants LLMs exceptional adaptability,
+allowing them to generalize across diverse tasks
+with minimal fine-tuning (Levine et al., 2022; Zhao
+et al., 2021).
+3
+Methodology
+This section describes the architecture of STORY-
+TELLER and the interactions amongits components.
+First, we provide an overview of three core mod-
+ules (§3.1). We then present a top-down workflow
+analyzing the sequential stages of narrative gener-
+ation: Stage 1 (§3.2), Stage 2 (§3.3
+--- Page 4 ---
+Extract recent events 
+from Storyline
+Storyline
+NEKG
+Modules
+CBN
+CEN
+Pseudo CPNi
+Add CPNi to CPNs
+Extract Nodes related to  
+Pseudo CPNi from NEKG
+Alex
+Doctor
+Subject
+time_stamp
+Verb
+Object
+CBN:
+ < Alex, begin, recovery >
+CEN:
+ < Alex, realize, hardships >
+[< Alex, realize, hardships>, 
+ <Alex, experience, vivid dreams>, 
+ […] 
+ <Alex, notice,  past hardships>]
+CPNs:
+Generated Nodes
+Chapter Title and Abstract
+Pseudo CPNi Generation
+Pseudo CPNi: < Alex, struggle,  physical recovery >
+Pseudo CPNi Review
+[…]
+Alex
+Alex
+live
+routine life
+experience
+Alex
+20
+notice
+headaches and dizziness
+past hardships 
+0
+1
+Recent Events
+Related Nodes
+MATCH (n1:entity {name: 'Alex'})-[r]->(n2: entity {name:'physical recovery'}) RETURN r
+MATCH (n1:entity {name: 'Alex'})-[r]->(n2) RETURN n1.name, r, n2.name
+MATCH (n1)-[r]->(n2:entity {name:’physical recovery’}) RETURN n1.name, r, n2.name
+[…]
+Subject
+time_stamp
+Verb
+Object
+Alex
+Alex
+notice
+subtle past hardship
+reflect vivid dreams
+20
+19
+[…]
+Alex
+seek
+second opinion
+7
+CPNi = Pseudo CPNi = < Alex, struggle,  physical recovery >
+CPNi = Modified CPNi = < Alex, struggle,  vivid dreams >
+OR
+Figure 3: Pseudo CPN Generation and Review. Specific example is used to provide a detailed description of the
+process. Additionally, it is clearly explained how the STORYLINE and NEKG provide relevant information to aid in
+the generation of CPN.
+NEKG.
+The narrative entity knowledge graph
+(NEKG) represents entities and their interrelation-
+ships in a structured, graph-based format. It com-
+prises nodes and edges, where nodes represent enti-
+ties or concepts (e.g., characters, locations, objects),
+and edges denote the relationships between them.
+NEKG effectively captures character interactions,
+object dynamics, and the logical progression of
+events within a story.
+NEKG serves as a tool for both systems and
+readers to intuitively understand the key drivers
+of narrative progression and uncover implicit rela-
+tional chains. We implement NEKG using Neo4j1,
+with each generated story having a corresponding
+NEKGinstance.
+In addition, NEKG is highly extensible. Beyond
+describing the current storyline, it supports future
+plot generation and reasoning. By leveraging rich
+associative data and logical relationships, the graph
+enables narrative expansion based on existing in-
+formation, facilitating the creation of new plotlines
+or character arcs. This capability not only aids
+story analysis but also inspires and guides creative
+development.
+1https://neo4j.com/
+3.2
+
+--- Page 5 ---
+3.3
+Stage 2: Mid-Level Plot Structuring
+In this stage, STORYTELLER generates NODES for
+each chapter. Both Chapter Begin Node (CBN)
+and Chapter End Node (CEN) are created first, fol-
+lowed by the sequential generation of Chapter Plot
+Nodes (CPN) in two steps.
+CBN and CEN Generation.
+This task involves
+generating CBN and CEN for each chapter. The
+process reviews the chapter’s title and abstract, en-
+suring that the generated CBN and CEN maintain
+logical coherence and smooth transition adjacent
+chapters. These NODES represent the chapter’s be-
+ginning and conclusion, so they incorporate infor-
+mation from the current, preceding, and following
+chapters.
+Pseudo CPN Generation and Review.
+The pre-
+vious module’s design enables structured storage
+of generated story information, providing a foun-
+dation for CPN generation to ensure plot quality.
+However, due to context length and cost constraints
+of LLMs, only a subset of data from STORYLINE
+and NEKG can be used, raising the challenge:
+How to extract relevant information from the exten-
+sive data?
+To address the, Pseudo CPN is generated based
+on existing CBN, CEN and CPN. Using the Pseudo
+CPN (S′V′O′), relevant nodes matching S′ and O′
+are retrieved from NEKG, representing the most
+recent events between S′ and O′. Nodes where the
+subject or object are S′ or O′ are also retrieved, rep-
+resenting recent events related to S′ and O′ (Figure
+3).
+These nodes are reviewed to assess whether the
+Pseudo CPN maintains coherence and fluency. If it
+passes, the Pseudo CPN is accepted as the CPN. If
+it fails, LLM generates a modified CPN based on
+contextual information and the Pseudo CPN, along
+with an explanation for the modification. The CPN
+is added to CPNs, and this process repeats until the
+generated CPN aligns with CEN, signaling the com-
+pletion of the chapter’s plot node generation.Details
+of CPN’s review can be found in Section D.
+3.4
+Stage 3: Detailed Story Writing
+Text Block Generation.
+In this stage, the model
+adheres strictly to the established plot nodes (CBN,
+CPNs, CEN) to ensure narrative coherence and
+consistency. The precise plot structure maintains
+the logical flow of events. Additionally, to ensure
+consistent linguistic style across the narrative, the
+# Train Stories
+272,600
+# Test Stories
+15,138
+# Validation Stories
+15,620
+# Prompt Words
+7.7M
+# Story Words
+200M
+Average Length of Prompts
+28.4
+Average Length of Stories
+734.5
+Table 2: Statiscs of WRITINGPROMPTS dataset.
+previously generated text block from the 
+--- Page 6 ---
+Model / Method
+Avg
+Perspectives
+Overall
+Word Count
+Creativity
+Coherence
+Engagement
+Relevance
+Model
+GPT-4o
+1,076
+50.0
+50.0
+50.0
+50.0
+50.0
+Qwen2-72B-Instruct
+5,173
+25.0
+25.0
+25.5
+31.3
+18.3
+Llama3.1-70B-Instruct
+1,578
+46.2
+50.8
+42.4
+49.2
+31.4
+LongWriter-glm4-9b
+5,191
+60.2
+68.3
+64.0
+67.3
+62.7
+LongWriter-llama3.1-8b
+5,659
+47.8
+53.5
+51.8
+54.7
+43.1
+Method
+DOC v2
+7,323
+60.4
+49.7
+52.2
+51.6
+50.9
+STORYTELLER (ours)
+7,594
+74.7
+72.8
+66.5
+77.6
+89.4
+- w/o NEKG
+7,459
+72.2
+67.8
+64.2
+67.3
+87.7
+- w/o Pseudo CPN Review
+5,204
+68.8
+67.7
+66.5
+71.0
+79.1
+Table 3: Overall results of different models or methods. STORYTELLER excels across all metrics, achieving a high
+average word count (7,594) and the highest Overall score of 89.4. This performance significantly outperforms other
+models. Additionally, STORYTELLER leads in five distinct evaluation perspectives. The best-performing model for
+each metric is highlighted in-bold, and the second-best model is underlined.
+of generating over 10,000 words in a single
+output.
+• DOC v24: An improved version of DOC, fea-
+turing a detailed outliner for structured, multi-
+level outlines and a controller to ensure adher-
+ence to the outline.
+Configuration.
+All open-source models are in-
+ferred on 8 * NVIDIA A100 GPUs using vllm5
+(Kwon et al., 2023), with temperature set to 0
+and max_tokens set to 16,384 in SamplingParams,
+employing greedy decoding for inference.
+For DOC v2 and STORYTELLER, GPT-4o is uti-
+lized as the engine. Additionally, GPT-4o serves as
+the judge model for all evaluations.
+Metrics.
+To comprehensively assess the perfor-
+mance of stories generated by STORYTELLER, eval-
+uations are conducted from multiple perspectives.
+First, the length of generated texts is measured
+using the Average Word Count metric. Next,
+the overall quality is evaluated through an Over-
+all score. Additionally, detailed assessments are
+performed across five specific dimensions:
+1. Creativity. Originality of the plot and charac-
+ters.
+2. Coherence. Clarity of the narrative structure
+and flow.
+4https://github.com/facebookresearch/
+doc-storygen-v2
+5An efficient LLM inference engine
+3. Engagement. The extent to which the story
+captivates readers and sustains their emotional
+involvement and curiosity.
+4. Relevance.
+Alignment with the theme,
+prompt, or background.
+5. Overall. A holistic evaluation considering
+alignment with the prompt, character and plot
+development, reader engagement, originality,
+and areas for improvement.
+Following the arena-hard-auto (Li et al.,
+--- Page 7 ---
+also increase, potentially lowering the Dis-
+tinct score. DistinctL-n, defined in Equation
+3, incorporates text length to provide a fairer
+assessment of diversity in longer texts.
+DistinctL −n = unique n-grams
+total n-grams
+× (1 + log(word_count)) (3)
+4.2
+Comprehensive Evaluation
+Directly asking an LLM to rate generated stories
+across multiple dimensions can yield unstable re-
+sults. This instability arises from the high vari-
+ability of the stories and their often lengthy na-
+ture, which complicates the provision of effective
+few-shot guidance in the prompt. Inspired by Li
+et al. (2024), we select GPT-4o as the reference
+model and evaluate stories generated by other mod-
+els against it with 200 randomly picked prompts
+across multiple dimensions. The score is defined
+as 1
+N
+P
+{i,j}(f(πj < πi) −O(πj < πi))2, more
+details can be found in Appendix B. To ensure the
+model accurately understands the comparison cri-
+teria for each dimension, we develop a detailed
+checklist for each evaluation dimension, enabling
+the LLM to conduct comparative assessments ef-
+fectively.
+As shown in Table 3, STORYTELLER performs
+exceptionally well across all evaluated dimensions.
+It achieves an average word count of 7,594, and
+demonstrates significant advantages in Creativity,
+Coherence, Engagement, Relevance, and Overall
+Performance. With an Overall score of 89.4, STO-
+RYTELLER outperforms all other models, none of
+which exceed 65 points. This underscores STORY-
+TELLER’s superior ability to generate high-quality,
+well-rounded narratives.
+For Creativity, STORYTELLER scores reaches
+74.7, significantly surpassing DOC v2 (60.4), re-
+flecting the ability to craft imaginative and in-
+novative narratives. In Coherence, the score of
+STORYTELLER is 72.8, slightly outperforming
+LongWriter-glm4-9b (68.3), showcasing stronger
+logical consistency and well-structured storytelling.
+For Engagement, STORYTELLER achieves 66.5,
+exceeding LongWriter-glm4-9b’s 64.0, demonstrat-
+ing a stronger capacity to captivate audiences. In
+Relevance, STORYTELLER again leads with 77.6,
+highlighting the capability to generate content
+closely aligned with prompts.
+It is also noteworthy that Qwen2-72B-Instruct
+generates stories with a significantly higher average
+GPT-4o
+Qwen2-72B 
+-Instruct
+Meta-Llama-3.1-70B 
+-Instruct
+LongWriter- 
+glm4-9b
+LongWriter- 
+llama3.1-8b
+DOC v2
+0%
+25%
+50%
+75%
+100%
+Storyteller wins
+Tie
+Storyteller Loses
+63%
+98%
+23%
+97%
+69%
+85%
+70%
+14%
+20%
+12%
+20%
+Figure 4: Results of preference evaluation u
